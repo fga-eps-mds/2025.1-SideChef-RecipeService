@@ -1,0 +1,6 @@
+fastapi
+pymongo[srv]
+motor
+python-dotenv
+uvicorn
+fastapi[standard]
