@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   mongo:
     image: mongo:5
@@ -7,6 +5,23 @@ services:
       - "27017:27017"
     volumes:
       - mongo-data:/data/db
-
+  
+  fastapi:
+    container_name: recipeservice-api
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    image: recipeservice-api
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
+    environment:
+      - DEBUG=true
+    volumes:
+      - ./:/recipeservice
+    depends_on:
+      - mongo
+    restart: on-failure
 volumes:
   mongo-data:

@@ -1,42 +1,41 @@
 # 2025.1-SideChef-RecipeService
+## Descrição 
+Este repositório visa armazenar o microsserviço RecipeService do aplicativo SideChef, responsável pela gestão dos objetos relacionados às receitas.
+
+## Tecnologias
+|||
+|-----------|--------|
+| __Linguagem__ | Python |
+| __Backend__ | FastAPI |
+| __Banco de Dados__| MongoDB |
 
 ## Como rodar o projeto
 
-### Rodar o docker
-docker compose up --build
+### 1. Instalar o Docker Engine
 
-### Criar ambiente virtual
-```
-python3 -m venv .venv
-```
+Primeiramente instale o [Docker](https://www.docker.com) no seu computador.
+### 2. Clone o repositório
+Clone este repositório na sua máquina.
 
-### Ativar ambiente
-### For linux or mac
-```
-source .venv/bin/activate
-```
-
-### For windows
-```
-venv\Scripts\activate
-```
-
-### Instalar as dependências
-```
-pip install -r requirements.txt
-```
-
-### .env
-
-Subistituir valores em PORT.
+### 3. Crie o arquivo .env
+Dentro do reposítório, crie um arquivo chamado `.env` e adicione as informações enviadas pelos mantenedores, ou configure a própria pelo template:
 
 ```
-criar arquivo .env
-MONGO_URI=mongodb://localhost:PORT
+DOMAIN=$DOMAIN$
+ENVIRONMENT=$local$
+BACKEND_CORS_ORIGINS=$http://localhost:PORT$
+JWT_SECRET_KEY=$JWT$
+```
+### 4. Execute o docker-compose up
+
+Na pasta do repositório execute o comando:
 
 ```
+docker-compose up
+```
 
-### Rodar o código
-```
-fastapi dev main.py
-```
+### 5. Acesse a API
+Para acessar a API, utilize o *localhost* na porta *8080*:
+
+http://localhost:8080/docs
+
