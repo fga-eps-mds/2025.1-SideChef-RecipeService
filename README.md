@@ -35,7 +35,10 @@ docker-compose up
 ```
 
 ### 5. Acesse a API
-Para acessar a API, utilize o *localhost* na porta *8080*:
+Para acessar a API, utilize o `localhost` na porta `8080`:
 
 http://localhost:8080/docs
 
+Já para acessar o bando de dados MongoDB, acesse pela porta `8081`:
+
+http://localhost:8081
