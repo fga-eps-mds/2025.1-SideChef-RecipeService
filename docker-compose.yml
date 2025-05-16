@@ -44,6 +44,8 @@ services:
     depends_on:
       - mongo
     restart: on-failure
+    networks:
+      - mongo-compose-network
 
 networks:
   mongo-compose-network:
