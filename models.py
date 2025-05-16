@@ -4,7 +4,7 @@ from typing import List
 
 class Recipe(BaseModel):
     name: str
+    type: str
+    difficulty: int
     ingredients: List[str]
     preparation: str
-    preparation_time: str #exemplo "30 minutos" 
-    portions: int

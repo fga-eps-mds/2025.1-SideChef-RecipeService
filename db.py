@@ -8,7 +8,7 @@ load_dotenv()
 def get_db():
     try:
         client = MongoClient(os.getenv("MONGODB_URI"))
-        db = client["recipe_db"]
+        db = client["RecipeService"]
         return db
     except ConnectionFailure:
         print("Database connection Error")
