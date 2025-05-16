@@ -1,9 +1,5 @@
-from motor.motor_asyncio import AsyncIOMotorClient
-from dotenv import load_dotenv
-import os
+from pymongo import MongoClient
+from core.config_loader import settings
 
-load_dotenv()
-
-MONGO_URI = os.getenv("MONGO_URI")
-client = AsyncIOMotorClient(MONGO_URI)
-db = client["mydatabase"]
+client = MongoClient(settings.MONGO_URL)
+db = client[settings.DB_NAME]
