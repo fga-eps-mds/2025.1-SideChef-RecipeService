@@ -1,7 +1,8 @@
-from fastapi import FastAPI, HTTPException, Path
+from fastapi import FastAPI, HTTPException, Query
 from recipe.routes.recipe import router
 from models import Recipe
 from db import get_db
+from typing import List, Optional
 
 app = FastAPI()
 
@@ -26,18 +27,20 @@ async def create_recipe(recipe: Recipe):
     recipes_collection.insert_one(recipe.model_dump())
     return {"message": "Recipe created successfully", "recipe": recipe}
 
-@app.get("/recipes/{name}", tags=["Recipes"])
-async def get_recipe(name: str = Path(..., description="Name of the recipe to retrieve")):
+
+@app.get("/recipes", tags=["Recipes"])
+async def get_recipes(name: Optional[str] = Query(None, description="Optional name filter for recipes")):
     db = get_db()
     if db is None:
         raise HTTPException(status_code=500, detail="Database connection error")
 
     recipes_collection = db["recipes"]
 
-    recipe_data = recipes_collection.find_one({"name": name})
-    
-    if not recipe_data:
-        raise HTTPException(status_code=404, detail="Recipe not found")
+    query = {"name": name} if name else {}
 
-    recipe_data["_id"] = str(recipe_data["_id"])
-    return recipe_data
+    recipes = list(recipes_collection.find(query))
+
+    for recipe in recipes:
+        recipe["_id"] = str(recipe["_id"])
+
+    return recipes
