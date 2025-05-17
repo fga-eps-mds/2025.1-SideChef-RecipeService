@@ -3,7 +3,7 @@ import numpy as np
 import cv2
 import pytesseract
 import ocr_utils as ocr
-# pip install fastapi uvicorn python-multipart numpy opencv-python pytesseract
+# pip install fastapi python-multipart numpy opencv-python pytesseract
 # also download tesseract v5.5.0.20241111
 
 router = APIRouter()
@@ -26,13 +26,16 @@ async def run_ocr(file: UploadFile = File(...)):
       processed_image = process_image.execute()  # Run execute function
 
         # Extract and return OCR result
-      extracted_text = pytesseract.image_to_string(processed_image, lang='por')
-      cut_text = extracted_text.split('\n')[0]  # Fetch only first line
-
+      extracted_text = pytesseract.image_to_string(processed_image,
+                                                    lang='por',
+                                                    config='--oem 3 -c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+                                                  )
+      
+      # cut_text = extracted_text.split('\n')[0]  # Fetch only first line
       # print(cut_text.strip())  # For development only
       # process_image.show_steps()  # Show desired steps from image enhancing process (development only)
 
-      return [cut_text.strip()]
+      return [extracted_text.strip()]
     
     except Exception as err:
        return {"error": f"File upload failed: {str(err)}"}
