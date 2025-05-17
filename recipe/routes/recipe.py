@@ -20,3 +20,14 @@ async def list_items():
         {"id": str(item["_id"]), **{k: v for k, v in item.items() if k != "_id"}}
         for item in items
     ]
+
+@router.get("/recipes")
+def get_recipes():
+    collection = db["recipes"]
+    recipes = []
+    for recipe in collection.find():
+        recipe["id"] = str(recipe["_id"])
+        recipe.pop("_id")
+        recipe["Modo_de_Preparo"] = recipe.pop("Modo de Preparo", "")
+        recipes.append(recipe)
+    return recipes
