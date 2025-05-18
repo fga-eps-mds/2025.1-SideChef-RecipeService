@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - dev
+      - github-actions
   pull_request:
     branches:
       - main
@@ -22,10 +23,11 @@ jobs:
       - name: Creating .env
         run: |
           cat <<EOF > .env
-          POSTGRES_HOST=db
-          POSTGRES_DB=postgres
-          POSTGRES_USER=postgres
-          POSTGRES_PASSWORD=password
+          ME_CONFIG_MONGODB_URL=mongodb://root:admin@localhost:27017/
+          ME_CONFIG_MONGODB_ADMINUSERNAME=root
+          ME_CONFIG_MONGODB_ADMINPASSWORD=admin
+          MONGO_INITDB_ROOT_USERNAME=root
+          MONGO_INITDB_ROOT_PASSWORD=admin
           EOF
 
       - name: Run docker compose
