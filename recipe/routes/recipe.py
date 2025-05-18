@@ -13,21 +13,22 @@ async def create_item(item: Item):
     result = await db["items"].insert_one(item.dict())
     return {"id": str(result.inserted_id)}
 
-@router.get("/items/")
-async def list_items():
-    items = await db["items"].find().to_list(100)
-    return [
-        {"id": str(item["_id"]), **{k: v for k, v in item.items() if k != "_id"}}
-        for item in items
-    ]
+# @router.get("/items/")
+# async def list_items():
+#     items = await db["items"].find().to_list(100)
+#     return [
+#         {"id": str(item["_id"]), **{k: v for k, v in item.items() if k != "_id"}}
+#         for item in items
+#     ]
 
 @router.get("/recipes")
-def get_recipes():
-    collection = db["recipes"]
-    recipes = []
-    for recipe in collection.find():
-        recipe["id"] = str(recipe["_id"])
-        recipe.pop("_id")
-        recipe["Modo_de_Preparo"] = recipe.pop("Modo de Preparo", "")
-        recipes.append(recipe)
-    return recipes
+def get_recipes(ingrediente : str):
+                                            #como é uma str e não uma list usa regex
+        cursor = db["recipes"].find({"Ingredientes": {"$regex": fr"\b{ingrediente}\b", "$options": "i"}})
+        items = []
+        for item in cursor:
+            item["id"] = str(item["_id"])
+            item.pop("_id")
+            items.append(item)
+        return items
+
