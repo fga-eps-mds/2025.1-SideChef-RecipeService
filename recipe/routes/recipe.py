@@ -42,10 +42,10 @@ def get_recipes(ingredients : list[str]):
     ingredientsList = [item.strip() for item in ingredients]
 
     #criar um lista com as querys de cada ingrediente da lista
-    filters = [
-        {"Ingredientes": {"$regex": fr"\b{item}a*o*s*\b", "$options": "i"}}
-        for item in ingredientsList
-    ]
+    filters = []
+    for item in ingredientsList:
+        f = {"Ingredientes": {"$regex": fr"\b{item}a*o*s*\b", "$options": "i"}}
+        filters.append(f)
 
     #buscar receitas com todos os ingredientes (operador "$and")
     query = db["recipes"].find({"$and": filters})
@@ -54,22 +54,22 @@ def get_recipes(ingredients : list[str]):
         item["id"] = str(item["_id"])
         item.pop("_id")
         items.append(item)
-
-    if items:
         return items
+    # if items:
+        # return items
 
-    #se não tiver receitas com todos os ingredientes, buscar uma que tenha alguns deles (operador "$or")
-    or_query = db["recipes"].find({"$or": filters})
-    some_items = []
-    for item in or_query:
-        item["id"] = str(item["_id"])
-        item.pop("_id")
-        some_items.append(item)
+    # #se não tiver receitas com todos os ingredientes, buscar uma que tenha alguns deles (operador "$or")
+    # or_query = db["recipes"].find({"$or": filters})
+    # some_items = []
+    # for item in or_query:
+    #     item["id"] = str(item["_id"])
+    #     item.pop("_id")
+    #     some_items.append(item)
 
-    if some_items:
-        return {
-            "message": "Não há receitas com todos os ingredientes. Mostrando receitas com alguns deles.",
-            "recipes": some_items
-        }
+    # if some_items:
+    #     return {
+    #         "message": "Não há receitas com todos os ingredientes. Mostrando receitas com alguns deles.",
+    #         "recipes": some_items
+    #     }
 
-    raise HTTPException(status_code=404, detail="Não há receitas com nenhum desses ingredientes.")
+    # raise HTTPException(status_code=404, detail="Não há receitas com nenhum desses ingredientes.")
