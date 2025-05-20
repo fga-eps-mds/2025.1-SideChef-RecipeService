@@ -2,14 +2,17 @@ from fastapi import APIRouter, UploadFile, File
 import numpy as np
 import cv2
 import pytesseract
-import ocr_utils as ocr
+import recipe.routes.utils.ocr_utils as ocr
 # pip install fastapi python-multipart numpy opencv-python pytesseract
 # also download tesseract v5.5.0.20241111
 
-router = APIRouter()
+router = APIRouter(
+   prefix="/ocr",
+   tags=["OCR"]
+)
 
-  # Endpoint to run OCR receiving target image as POST method
-@router.post("/run-ocr/", tags=["OCR"])
+# Endpoint to run OCR receiving target image as POST method
+@router.post("/run-ocr/")
 async def run_ocr(file: UploadFile = File(...)):
     try:
         # Read file
