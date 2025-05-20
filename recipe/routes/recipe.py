@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException
 from recipe.models.recipe import Item
 from core.database import db
 from bson import ObjectId
+from fastapi.responses import JSONResponse
 
 router = APIRouter(
     prefix="/recipe",
@@ -35,7 +36,7 @@ def get_recipes(ingrediente : str):
 
 
 #usar o método post, porque get não suportou entrada de dados mais complexos como listas
-@router.post("/allIngredients")
+@router.post("/allIngredientss")
 def get_recipes(ingredients : list[str]):
 
     #garantir que não tem nenhum espaço em branco
@@ -54,22 +55,37 @@ def get_recipes(ingredients : list[str]):
         item["id"] = str(item["_id"])
         item.pop("_id")
         items.append(item)
-        return items
-    # if items:
-        # return items
 
-    # #se não tiver receitas com todos os ingredientes, buscar uma que tenha alguns deles (operador "$or")
-    # or_query = db["recipes"].find({"$or": filters})
-    # some_items = []
-    # for item in or_query:
-    #     item["id"] = str(item["_id"])
-    #     item.pop("_id")
-    #     some_items.append(item)
+    if not items:
+        raise HTTPException(status_code=404, detail="Não há receitas com todos esses ingredientes.")
+    return {
+        "recipies" : items
+    }
 
-    # if some_items:
-    #     return {
-    #         "message": "Não há receitas com todos os ingredientes. Mostrando receitas com alguns deles.",
-    #         "recipes": some_items
-    #     }
+    #se não tiver receitas com todos os ingredientes, buscar uma que tenha alguns deles (operador "$or")
+@router.post("/SomeIngredientss")
+def get_recipes(ingredients : list[str]):
 
-    # raise HTTPException(status_code=404, detail="Não há receitas com nenhum desses ingredientes.")
+    #garantir que não tem nenhum espaço em branco
+    ingredientsList = [item.strip() for item in ingredients]
+
+    filters = []
+    for item in ingredientsList:
+        f = {"Ingredientes": {"$regex": fr"\b{item}a*o*s*\b", "$options": "i"}}
+        filters.append(f)
+
+
+    or_query = db["recipes"].find({"$or": filters})
+    some_items = []
+    for item in or_query:
+        item["id"] = str(item["_id"])
+        item.pop("_id")
+        some_items.append(item)
+
+    if some_items:
+        return JSONResponse(content={
+        "message": "Não há receitas com todos os ingredientes. Mostrando receitas com alguns deles.",
+        "recipies": some_items
+    })
+
+    raise HTTPException(status_code=404, detail="Não há receitas com nenhum desses ingredientes.")
