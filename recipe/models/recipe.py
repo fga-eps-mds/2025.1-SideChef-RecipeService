@@ -1,6 +1,9 @@
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import List
 
-class Item(BaseModel):
-    name: str = Field(...)
-    description: Optional[str] = None
+class Recipe(BaseModel):
+    Nome: str
+    Tipo: str
+    Dificuldade: str
+    Ingredientes: List[str]
+    Preparo: str
