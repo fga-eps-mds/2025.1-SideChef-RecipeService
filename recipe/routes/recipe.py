@@ -38,13 +38,6 @@ async def get_recipes(name: Optional[str] = Query(None, description="Optional na
 
     return recipes
 
-# @router.get("/items/")
-# async def list_items():
-#     items = await db["items"].find().to_list(100)
-#     return [
-#         {"id": str(item["_id"]), **{k: v for k, v in item.items() if k != "_id"}}
-#         for item in items
-#     ]
 
 @router.get("/oneIngredient")
 def get_recipes(ingrediente : str):
