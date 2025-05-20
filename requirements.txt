@@ -1,0 +1,11 @@
+fastapi
+pymongo[srv]
+motor
+python-dotenv
+uvicorn
+fastapi[standard]
+python-multipart
+numpy
+opencv-python
+pytesseract
+pytest

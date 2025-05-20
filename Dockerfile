@@ -1,0 +1,24 @@
+FROM python:3.13-slim
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+WORKDIR /recipeservice
+
+RUN apt-get update && apt-get install -y \
+    tesseract-ocr \
+    tesseract-ocr-por \
+    libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender-dev \
+    libgl1-mesa-glx \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY ./requirements.txt /recipeservice/requirements.txt
+
+RUN pip install --no-cache-dir -r /recipeservice/requirements.txt
+
+COPY . /recipeservice
+
+CMD ["fastapi", "dev", "main.py", "--host", "0.0.0.0", "--port", "8080"]
