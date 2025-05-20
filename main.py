@@ -1,8 +1,6 @@
 from fastapi import FastAPI
 from recipe.routes.recipe import router
-from models import Recipe
-from db import get_db
-from typing import List, Optional
+
 
 app = FastAPI()
 
