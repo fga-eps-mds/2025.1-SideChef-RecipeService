@@ -38,7 +38,8 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - DEBUG=true
+      DEBUG: "true"
+      FRONTEND_CORS_ORIGINS: ${FRONTEND_CORS_ORIGINS}
     volumes:
       - ./:/recipeservice
     depends_on:
