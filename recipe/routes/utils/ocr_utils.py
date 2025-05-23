@@ -1,4 +1,63 @@
+from dotenv import dotenv_values
+from google import genai
+from google.genai import types
+from pathlib import Path
 import cv2
+
+class Gemini:
+    def __init__(self, content):
+        self.content = content
+
+    def execute(self):
+        if not self.initialize_gemini():
+            return {"error": "Could not initialize Gemini"}
+        self.run_gemini()
+        return self.response.text
+
+        # Returns .env file's values
+    def get_dotenv(self):
+        dotenv_path = Path(__file__).parent.parent.parent.parent / ".env"  # Gets script relative path to the .env file
+        if not dotenv_path.exists():
+            print("error: Could not find .env file")
+            return None
+        else: return dotenv_values(dotenv_path)
+
+        # Returns string with gemini's system instructions from gemini_system_instructions.txt
+    def get_system_instructions(self):
+        instructions_path = Path(__file__).parent / "gemini_system_instructions.txt"  # Gets script relative path
+        with open(instructions_path, 'r', encoding='utf-8') as file:
+            if not file:
+                print("error: Could not find gemini_system_instructions.txt")
+                return None
+            else : 
+                system_instructions=file.read()
+                return system_instructions
+
+        # Setup gemini 
+    def initialize_gemini(self):
+        dotenv = self.get_dotenv()
+        if not dotenv:
+            return False
+        api_key = dotenv.get("GEMINI_API_KEY")
+        if not api_key:
+            return False
+        
+        try:
+            self.client = genai.Client(api_key=api_key)
+            return True
+        except:
+            return False
+
+        # Configure and Run gemini model
+    def run_gemini(self):
+        system_instructions = self.get_system_instructions()
+        self.response = self.client.models.generate_content(
+            model="gemini-2.0-flash",
+            config=types.GenerateContentConfig(
+                system_instruction=system_instructions
+            ),
+            contents=self.content
+        )
 
 class Enhance:
 
@@ -12,6 +71,7 @@ class Enhance:
         self.equalize_contrast()
         self.thresholding()
         self.resize()
+        # self.show_steps()  # (for development only)
         return self.resized
 
         # Aplly Canny edge filter (currently unused)
