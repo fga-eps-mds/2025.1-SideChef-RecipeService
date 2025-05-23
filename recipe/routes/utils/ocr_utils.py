@@ -2,7 +2,14 @@ from dotenv import dotenv_values
 from google import genai
 from google.genai import types
 from pathlib import Path
+import pytesseract
 import cv2
+
+    # Extract and return OCR result
+def run_ocr(image):
+    custom_config = '--oem 3 -c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+    output = pytesseract.image_to_string(image, lang='por', config=custom_config)
+    return output
 
 class Gemini:
     def __init__(self, content):
@@ -90,7 +97,6 @@ class Enhance:
 
         # Apply thresholding to enhance optimized contrast in black and white
     def thresholding(self):
-        # _, self.thresh = cv2.threshold(self.equalized, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
         self.thresh = cv2.adaptiveThreshold(
             self.equalized, 255,
             cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
@@ -101,6 +107,11 @@ class Enhance:
         # Reescale the image to make it easier to read
     def resize(self):
         self.resized = cv2.resize(self.thresh, None, fx=2, fy=2, interpolation=cv2.INTER_LINEAR)
+
+        # Invert image to read products with dark background
+    def invert_image(self):
+        inverted_image = cv2.bitwise_not(self.resized)
+        return inverted_image
 
         # Pop up windows with desired steps (used for development only)
     def show_steps(self):

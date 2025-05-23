@@ -1,7 +1,6 @@
 from fastapi import APIRouter, UploadFile, File
 import numpy as np
 import cv2
-import pytesseract
 import recipe.routes.utils.ocr_utils as ocr
 # pip install fastapi python-multipart numpy opencv-python pytesseract dotenv google-genai pathlib
 # also download tesseract v5.5.0.20241111
@@ -29,17 +28,25 @@ async def run_ocr(file: UploadFile = File(...)):
     process_image = ocr.Enhance(image)  # Initialize class with target image
     processed_image = process_image.execute()  # Run execute function
 
-      # Extract and return OCR result
-    extracted_text = pytesseract.image_to_string(processed_image,
-                                                  lang='por',
-                                                  config='--oem 3 -c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
-                                                )
+      # Extract OCR output
+    extracted_text = ocr.run_ocr(processed_image)
 
       # Send OCR's results to gemini and get response
     initialize_gemini = ocr.Gemini(extracted_text)
     product = initialize_gemini.execute()
 
-    return [product.strip()]
+      # Check if reading failed
+    if product.strip() == "reading_failed":
+      processed_image = process_image.invert_image()  # Try alternative image processing  
+      
+      extracted_text = ocr.run_ocr(processed_image)  # Re-run ocr
+
+      initialize_gemini = ocr.Gemini(extracted_text)  # Initialize gemini again and send new OCR output
+      product = initialize_gemini.execute()
+
+    if product.strip() == "reading_failed":
+      return [f"reading_failed: {str(extracted_text.strip())}"]  
+    else: return [product.strip()]
   
   except Exception as err:
     return {"error": f"File upload failed: {str(err)}"}
