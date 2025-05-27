@@ -60,7 +60,7 @@ class Gemini:
     def run_gemini(self):
         system_instructions = self.get_system_instructions()
         self.response = self.client.models.generate_content(
-            model="gemini-2.0-flash",
+            model="gemini-2.0-flash",  # Only runs up to 15 requests per minute (RPM)
             config=types.GenerateContentConfig(
                 system_instruction=system_instructions
             ),

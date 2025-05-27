@@ -3,7 +3,7 @@ import numpy as np
 import cv2
 import recipe.routes.utils.ocr_utils as ocr
 # pip install fastapi python-multipart numpy opencv-python pytesseract dotenv google-genai pathlib
-# also download tesseract v5.5.0.20241111
+# Also download tesseract v5.3.0
 
 # Router setup
 router = APIRouter(
