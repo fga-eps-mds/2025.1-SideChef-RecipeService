@@ -269,3 +269,6 @@ fabric.properties
 .idea/caches/build_file_checksums.ser
 
 .DS_Store
+
+# Ignore OCR log images folder
+recipe/routes/utils/ocr_image_logs/
