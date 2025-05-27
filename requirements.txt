@@ -11,4 +11,3 @@ pytesseract
 pytest
 google-genai
 pathlib
-shutil
