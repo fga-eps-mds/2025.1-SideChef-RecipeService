@@ -4,6 +4,7 @@ from google.genai import types
 from pathlib import Path
 import pytesseract
 import cv2
+import shutil
 
     # Extract and return OCR result
 def run_ocr(image):
@@ -78,7 +79,6 @@ class Enhance:
         self.equalize_contrast()
         self.thresholding()
         self.resize()
-        # self.show_steps()  # (for development only)
         return self.resized
 
         # Aplly Canny edge filter (currently unused)
@@ -89,9 +89,11 @@ class Enhance:
     def gray_scale(self):
         self.gray_scale_img = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
 
+        # Apply bilateral filtering to diminish the difference between areas with similar colors
     def bilateral_filter(self):
         self.bi_filtered = cv2.bilateralFilter(self.gray_scale_img, 9, 75, 75)
 
+        # Equalize contrast to avoid either too bright or too dark areas
     def equalize_contrast(self):
         self.equalized = cv2.equalizeHist(self.bi_filtered)
 
@@ -110,21 +112,27 @@ class Enhance:
 
         # Invert image to read products with dark background
     def invert_image(self):
-        inverted_image = cv2.bitwise_not(self.resized)
-        return inverted_image
+        self.inverted_image = cv2.bitwise_not(self.resized)
+        return self.inverted_image
 
-        # Pop up windows with desired steps (used for development only)
-    def show_steps(self):
-        cv2.namedWindow("Thresholding", cv2.WINDOW_NORMAL)
-        cv2.resizeWindow("Thresholding", 800, 600)
-        cv2.imshow("Thresholding", self.thresh)
+        # Saves images from desired steps (used for development only)
+    def store_process_images(self):
+        try:
+            folder = Path(__file__).parent / "ocr_image_logs"
 
-        cv2.namedWindow("Original Image", cv2.WINDOW_NORMAL)
-        cv2.resizeWindow("Original Image", 800, 600)
-        cv2.imshow("Original Image", self.img)
+            if folder.exists():
+                shutil.rmtree(folder)  # Deletes folder and its content
+            
+              # Creates new empty folder
+            folder.mkdir(parents=True, exist_ok=True)
 
-        cv2.waitKey(0)  # Wait key press to close windows
-        cv2.destroyAllWindows()
-
-
+              # Writes every desired step into the folder
+            cv2.imwrite(str(folder / "original_img.png"), self.img)
+            cv2.imwrite(str(folder / "thresholding.png"), self.thresh)
+            cv2.imwrite(str(folder / "equalized.png"), self.equalized)
+            if self.inverted_image is not None:
+                cv2.imwrite(str(folder / "inverted_img.png"), self.inverted_image)
+            
         
+        except Exception as err:
+            return {"error": f"Image log folder preparation failed: {str(err)}"}

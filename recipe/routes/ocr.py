@@ -44,6 +44,8 @@ async def run_ocr(file: UploadFile = File(...)):
       initialize_gemini = ocr.Gemini(extracted_text)  # Initialize gemini again and send new OCR output
       product = initialize_gemini.execute()
 
+    process_image.store_process_images()  # (for development only)
+
     if product.strip() == "reading_failed":
       return [f"reading_failed: {str(extracted_text.strip())}"]  
     else: return [product.strip()]
