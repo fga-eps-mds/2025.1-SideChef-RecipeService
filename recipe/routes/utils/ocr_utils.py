@@ -6,11 +6,15 @@ import pytesseract
 import cv2
 import shutil
 
+# -- Independent functions --
+
     # Extract and return OCR result
 def run_ocr(image):
     custom_config = '--oem 3 -c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
     output = pytesseract.image_to_string(image, lang='por', config=custom_config)
     return output
+
+# -- Classes --
 
 class Gemini:
     def __init__(self, content):
