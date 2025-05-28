@@ -20,7 +20,9 @@ class Gemini:
         if not self.initialize_gemini():
             return {"error": "Could not initialize Gemini"}
         self.run_gemini()
-        return self.response.text
+        if self.response and hasattr(self.response, 'text') and self.response.text is not None:
+            return self.response.text
+        return {"error": "Gemini execution returned invalid response"}
 
         # Returns .env file's values
     def get_dotenv(self):
@@ -33,13 +35,13 @@ class Gemini:
         # Returns string with gemini's system instructions from gemini_system_instructions.txt
     def get_system_instructions(self):
         instructions_path = Path(__file__).parent / "gemini_system_instructions.txt"  # Gets script relative path
-        with open(instructions_path, 'r', encoding='utf-8') as file:
-            if not file:
-                print("error: Could not find gemini_system_instructions.txt")
-                return None
-            else : 
+        try:
+            with open(instructions_path, 'r', encoding='utf-8') as file:
                 system_instructions=file.read()
                 return system_instructions
+        except:
+            print("error: Could not find gemini_system_instructions.txt")
+            return None
 
         # Setup gemini 
     def initialize_gemini(self):
