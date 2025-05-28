@@ -2,6 +2,7 @@ from dotenv import dotenv_values
 from google import genai
 from google.genai import types
 from pathlib import Path
+from ..route_functions import allIngredients
 import pytesseract
 import cv2
 import shutil
@@ -13,6 +14,19 @@ def run_ocr(image):
     custom_config = '--oem 3 -c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
     output = pytesseract.image_to_string(image, lang='por', config=custom_config)
     return output
+
+    # Filter recipes through gemini response and return compatible recipes
+def filter_recipes(extracted_text):
+    extracted_text = extracted_text.lower()
+
+    all_ingredients = ["leite"]  
+    ingredients = []
+    for item in all_ingredients:
+        if item in extracted_text:
+            ingredients.append(item)
+        
+    recipes = allIngredients(ingredients)
+    return recipes
 
 # -- Classes --
 

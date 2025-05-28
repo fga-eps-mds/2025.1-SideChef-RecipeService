@@ -48,7 +48,9 @@ async def run_ocr(file: UploadFile = File(...)):
 
     if product.strip() == "reading_failed":
       return [f"reading_failed: {str(extracted_text.strip())}"]  
-    else: return [product.strip()]
+    else: 
+      recipes = ocr.filter_recipes(product.strip())
+      return [recipes]
   
   except Exception as err:
     return {"error": f"File upload failed: {str(err)}"}
