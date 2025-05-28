@@ -1,6 +1,6 @@
 from fastapi import FastAPI
-from recipe.routes.recipe import router as recipe_router
-from recipe.routes.ocr import router as ocr_router
+from recipe.routes.recipe_routes import router as recipe_router
+from recipe.routes.ocr_routes import router as ocr_router
 
 
 app = FastAPI()
