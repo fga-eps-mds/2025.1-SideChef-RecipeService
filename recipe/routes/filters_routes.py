@@ -18,7 +18,7 @@ def get_recipes(name: Optional[str] = Query(None, description="Optional name fil
     for recipe in recipes:
         recipe["_id"] = str(recipe["_id"])
 
-def oneIngredient(ingrediente : str):
+def one_ingredient(ingrediente : str):
                                 #since it is a str and not a list, use regex     #accept plural
     print("search according to one item")                                               #case insensitive
     query = db["recipes"].find({"Ingredientes": {"$regex": fr"\b{ingrediente}a*o*s*\b", "$options": "i"}})        
@@ -56,7 +56,7 @@ def all_ingredients(ingredients : list[str]):
 
     #if there are no recipes with all ingredients, search for one that has some of them (operator "$or")
 
-def Some_ingredientss(ingredients : list[str]):
+def some_ingredients(ingredients : list[str]):
 
     #make sure that there are no white spaces
     ingredients_list = [item.strip() for item in ingredients]
