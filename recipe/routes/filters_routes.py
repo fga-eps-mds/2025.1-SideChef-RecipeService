@@ -5,7 +5,7 @@ from core.database import db
 from bson import ObjectId
 from fastapi.responses import JSONResponse
 
-def getRecipes(name: Optional[str] = Query(None, description="Optional name filter for recipes")):
+def get_recipes(name: Optional[str] = Query(None, description="Optional name filter for recipes")):
     if db is None:
         raise HTTPException(status_code=500, detail="Database connection error")
 
@@ -19,8 +19,8 @@ def getRecipes(name: Optional[str] = Query(None, description="Optional name filt
         recipe["_id"] = str(recipe["_id"])
 
 def oneIngredient(ingrediente : str):
-                                #como é uma str e não uma list usa regex     #aceitar plural
-    print("procura de acordo com um item")                                               #case insensitive
+                                #since it is a str and not a list, use regex     #accept plural
+    print("search according to one item")                                               #case insensitive
     query = db["recipes"].find({"Ingredientes": {"$regex": fr"\b{ingrediente}a*o*s*\b", "$options": "i"}})        
     items = []
     for item in query:
@@ -29,18 +29,18 @@ def oneIngredient(ingrediente : str):
         items.append(item)
     return items
 
-def allIngredients(ingredients : list[str]):
+def all_ingredients(ingredients : list[str]):
 
-    #garantir que não tem nenhum espaço em branco
-    ingredientsList = [item.strip() for item in ingredients]
+    #make sure there are no white spaces
+    ingredients_list = [item.strip() for item in ingredients]
 
-    #criar um lista com as querys de cada ingrediente da lista
+    #create a list with the queries for each ingredient in the list
     filters = []
-    for item in ingredientsList:
+    for item in ingredients_list:
         f = {"Ingredientes": {"$regex": fr"\b{item}a*o*s*\b", "$options": "i"}}
         filters.append(f)
 
-    #buscar receitas com todos os ingredientes (operador "$and")
+    #search for recipes with all ingredients (operator "$and")
     query = db["recipes"].find({"$and": filters})
     items = []
     for item in query:
@@ -49,20 +49,20 @@ def allIngredients(ingredients : list[str]):
         items.append(item)
 
     if not items:
-        raise HTTPException(status_code=404, detail="Não há receitas com todos esses ingredientes.")
+        raise HTTPException(status_code=404, detail="There are no recipes with all these ingredients.")
     return {
         "recipies" : items
     }
 
-    #se não tiver receitas com todos os ingredientes, buscar uma que tenha alguns deles (operador "$or")
+    #if there are no recipes with all ingredients, search for one that has some of them (operator "$or")
 
-def SomeIngredientss(ingredients : list[str]):
+def Some_ingredientss(ingredients : list[str]):
 
-    #garantir que não tem nenhum espaço em branco
-    ingredientsList = [item.strip() for item in ingredients]
+    #make sure that there are no white spaces
+    ingredients_list = [item.strip() for item in ingredients]
 
     filters = []
-    for item in ingredientsList:
+    for item in ingredients_list:
         f = {"Ingredientes": {"$regex": fr"\b{item}a*o*s*\b", "$options": "i"}}
         filters.append(f)
 
@@ -76,8 +76,8 @@ def SomeIngredientss(ingredients : list[str]):
 
     if some_items:
         return JSONResponse(content={
-        "message": "Não há receitas com todos os ingredientes. Mostrando receitas com alguns deles.",
+        "message": "There are no recipes with all the ingredients. Showing recipes with some of them.",
         "recipies": some_items
     })
 
-    raise HTTPException(status_code=404, detail="Não há receitas com nenhum desses ingredientes.")
+    raise HTTPException(status_code=404, detail="There are no recipes with any of these ingredients.")
