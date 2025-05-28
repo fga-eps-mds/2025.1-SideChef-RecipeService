@@ -5,7 +5,7 @@ from core.database import db
 from bson import ObjectId
 from fastapi.responses import JSONResponse
 
-def getRecipes(name: Optional[str] = Query(None, description="Optional name filter for recipes")):
+def get_recipes(name: Optional[str] = Query(None, description="Optional name filter for recipes")):
     if db is None:
         raise HTTPException(status_code=500, detail="Database connection error")
 
@@ -32,11 +32,11 @@ def oneIngredient(ingrediente : str):
 def allIngredients(ingredients : list[str]):
 
     #make sure there are no white spaces
-    ingredientsList = [item.strip() for item in ingredients]
+    ingredients_list = [item.strip() for item in ingredients]
 
     #create a list with the queries for each ingredient in the list
     filters = []
-    for item in ingredientsList:
+    for item in ingredients_list:
         f = {"Ingredientes": {"$regex": fr"\b{item}a*o*s*\b", "$options": "i"}}
         filters.append(f)
 
@@ -56,13 +56,13 @@ def allIngredients(ingredients : list[str]):
 
     #if there are no recipes with all ingredients, search for one that has some of them (operator "$or")
 
-def SomeIngredientss(ingredients : list[str]):
+def Some_ingredientss(ingredients : list[str]):
 
     #make sure that there are no white spaces
-    ingredientsList = [item.strip() for item in ingredients]
+    ingredients_list = [item.strip() for item in ingredients]
 
     filters = []
-    for item in ingredientsList:
+    for item in ingredients_list:
         f = {"Ingredientes": {"$regex": fr"\b{item}a*o*s*\b", "$options": "i"}}
         filters.append(f)
 
