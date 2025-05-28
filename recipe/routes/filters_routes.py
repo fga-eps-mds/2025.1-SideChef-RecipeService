@@ -29,7 +29,7 @@ def oneIngredient(ingrediente : str):
         items.append(item)
     return items
 
-def allIngredients(ingredients : list[str]):
+def all_ingredients(ingredients : list[str]):
 
     #make sure there are no white spaces
     ingredients_list = [item.strip() for item in ingredients]
