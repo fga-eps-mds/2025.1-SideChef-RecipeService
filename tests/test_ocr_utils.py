@@ -68,3 +68,14 @@ class TestGemini():
             assert dict_args['contents'] == gemini_instance.content
             assert dict_args['config'].system_instruction == mock_sys_instructions
             assert gemini_instance.response == mock_response
+
+    def test_execute(self, gemini_instance, mock_response):
+        with patch.object(gemini_instance, 'initialize_gemini', return_value=True), \
+             patch.object(gemini_instance, 'run_gemini') as mock_run_gemini:
+
+            gemini_instance.response = mock_response
+            result = gemini_instance.execute()
+
+            assert result == mock_response.text
+            mock_run_gemini.assert_called_once()
+             
