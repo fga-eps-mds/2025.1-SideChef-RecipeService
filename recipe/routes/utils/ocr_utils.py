@@ -2,7 +2,7 @@ from dotenv import dotenv_values
 from google import genai
 from google.genai import types
 from pathlib import Path
-from ..route_functions import allIngredients
+from ..filters_routes import allIngredients
 import pytesseract
 import cv2
 import shutil
