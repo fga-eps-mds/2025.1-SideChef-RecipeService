@@ -21,7 +21,7 @@ def get_recipes(name: Optional[str] = Query(None, description="Optional name fil
 def one_ingredient(ingrediente : str):
                                 #since it is a str and not a list, use regex     #accept plural
     print("search according to one item")                                               #case insensitive
-    query = db["recipes"].find({"Ingredientes": {"$regex": fr"\b{ingrediente}a*o*s*\b", "$options": "i"}})        
+    query = db["recipes"].find({"Ingredientes.ingrediente": {"$regex": fr"\b{ingrediente}a*o*s*\b", "$options": "i"}})        
     items = []
     for item in query:
         item["id"] = str(item["_id"])
@@ -37,7 +37,7 @@ def all_ingredients(ingredients : list[str]):
     #create a list with the queries for each ingredient in the list
     filters = []
     for item in ingredients_list:
-        f = {"Ingredientes": {"$regex": fr"\b{item}a*o*s*\b", "$options": "i"}}
+        f = {"Ingredientes.ingrediente": {"$regex": fr"\b{item}a*o*s*\b", "$options": "i"}}
         filters.append(f)
 
     #search for recipes with all ingredients (operator "$and")
@@ -51,7 +51,7 @@ def all_ingredients(ingredients : list[str]):
     if not items:
         raise HTTPException(status_code=404, detail="There are no recipes with all these ingredients.")
     return {
-        "recipies" : items
+        "recipes" : items
     }
 
     #if there are no recipes with all ingredients, search for one that has some of them (operator "$or")
@@ -63,7 +63,7 @@ def some_ingredients(ingredients : list[str]):
 
     filters = []
     for item in ingredients_list:
-        f = {"Ingredientes": {"$regex": fr"\b{item}a*o*s*\b", "$options": "i"}}
+        f = {"Ingredientes.ingrediente": {"$regex": fr"\b{item}a*o*s*\b", "$options": "i"}}
         filters.append(f)
 
 
@@ -77,7 +77,7 @@ def some_ingredients(ingredients : list[str]):
     if some_items:
         return JSONResponse(content={
         "message": "There are no recipes with all the ingredients. Showing recipes with some of them.",
-        "recipies": some_items
+        "recipes": some_items
     })
 
     raise HTTPException(status_code=404, detail="There are no recipes with any of these ingredients.")

@@ -19,11 +19,9 @@ def run_ocr(image):
 def filter_recipes(extracted_text):
     extracted_text = extracted_text.lower()
 
-    all_ingredients = ["leite"]  
     ingredients = []
-    for item in all_ingredients:
-        if item in extracted_text:
-            ingredients.append(item)
+    for item in extracted_text:
+        ingredients.append(item)
         
     recipes = all_ingredients(ingredients)
     return recipes
