@@ -10,17 +10,20 @@ router = APIRouter(
     tags=["Recipe"],
 )
 
-@router.post("/createRecipes/")
+@router.post("/createRecipes")
 async def create_recipe(recipe: Recipe):
     if db is None:
         raise HTTPException(status_code=500, detail="Database connection error")
     recipes_collection = db["recipes"]
 
-    if recipes_collection.find_one({"Nome": recipe.Nome}):
+    duplicate_recipe = await recipes_collection.find_one({"Nome": recipe.Nome})
+
+    if duplicate_recipe:
         raise HTTPException(status_code=400, detail="Recipe with this name already exists")
     
-    recipes_collection.insert_one(recipe.model_dump())
+    await recipes_collection.insert_one(recipe.model_dump())
     return {"message": "Recipe created successfully", "recipe": recipe}
+
 
 @router.get("/getRecipes")
 async def get_recipes(name: Optional[str] = Query(None, description="Optional name filter for recipes")):
@@ -40,7 +43,7 @@ async def get_recipes(name: Optional[str] = Query(None, description="Optional na
 
 
 @router.get("/oneIngredient")
-def get_recipes(ingrediente : str):
+def get_recipes_by_one(ingrediente : str):
                                 #como é uma str e não uma list usa regex     #aceitar plural
     print("procura de acordo com um item")                                               #case insensitive
     query = db["recipes"].find({"Ingredientes": {"$regex": fr"\b{ingrediente}a*o*s*\b", "$options": "i"}})        
@@ -53,8 +56,8 @@ def get_recipes(ingrediente : str):
 
 
 #usar o método post, porque get não suportou entrada de dados mais complexos como listas
-@router.post("/allIngredientss")
-def get_recipes(ingredients : list[str]):
+@router.post("/allIngredients")
+def get_recipes_by_all(ingredients : list[str]):
 
     #garantir que não tem nenhum espaço em branco
     ingredientsList = [item.strip() for item in ingredients]
@@ -80,8 +83,8 @@ def get_recipes(ingredients : list[str]):
     }
 
     #se não tiver receitas com todos os ingredientes, buscar uma que tenha alguns deles (operador "$or")
-@router.post("/SomeIngredientss")
-def get_recipes(ingredients : list[str]):
+@router.post("/SomeIngredients")
+def get_recipes_by_some(ingredients : list[str]):
 
     #garantir que não tem nenhum espaço em branco
     ingredientsList = [item.strip() for item in ingredients]
