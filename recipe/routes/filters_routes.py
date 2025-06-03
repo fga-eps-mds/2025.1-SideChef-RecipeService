@@ -5,19 +5,6 @@ from core.database import db
 from bson import ObjectId
 from fastapi.responses import JSONResponse
 
-def get_recipes(name: Optional[str] = Query(None, description="Optional name filter for recipes")):
-    if db is None:
-        raise HTTPException(status_code=500, detail="Database connection error")
-
-    recipes_collection = db["recipes"]
-
-    query = {"name": name} if name else {}
-
-    recipes = list(recipes_collection.find(query))
-
-    for recipe in recipes:
-        recipe["_id"] = str(recipe["_id"])
-
 def one_ingredient(ingrediente : str):
                                 #since it is a str and not a list, use regex     #accept plural
     print("search according to one item")                                               #case insensitive
@@ -49,7 +36,7 @@ def all_ingredients(ingredients : list[str]):
         items.append(item)
 
     if not items:
-        raise HTTPException(status_code=404, detail="There are no recipes with all these ingredients.")
+        raise HTTPException(status_code=404, detail=f"There are no recipes with all these ingredients: {ingredients_list}")
     return {
         "recipes" : items
     }

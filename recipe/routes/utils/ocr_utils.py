@@ -20,10 +20,10 @@ def filter_recipes(extracted_text):
     extracted_text = extracted_text.lower()
 
     ingredients = []
-    for item in extracted_text:
-        ingredients.append(item)
+    ingredients.append(extracted_text)
         
     recipes = all_ingredients(ingredients)
+
     return recipes
 
 # -- Classes --
