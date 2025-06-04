@@ -31,7 +31,7 @@ JWT_SECRET_KEY=$JWT$
 Na pasta do repositório execute o comando:
 
 ```
-docker-compose up
+docker compose up
 ```
 
 ### 5. Acesse a API
