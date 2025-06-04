@@ -2,9 +2,13 @@ from typing import Dict
 
 import pytest
 from fastapi.testclient import TestClient
-from unittest.mock import MagicMock, AsyncMock, patch
+from unittest.mock import MagicMock, AsyncMock
 
 from main import app
+
+# AsyncMock, MagicMock são objetos que simulam que simulam testes;
+# Pode adicionar métodos, como objeto Mock, e atributos simulados;
+# Side effect de Mocks executa uma função atribuída ao chamar o objeto;
 
 single_recipe = {
         "Nome": "Bolo de Caneca",
@@ -13,7 +17,6 @@ single_recipe = {
         "Ingredientes":  ["Massa", "ovo", "2 colheres (sopa) de achocolatado em pó", "3 colheres (sopa) rasas de açúcar", "4 colheres (sopa) rasas de farinha de trigo", "1 colher (sopa) de óleo", "fermento em pó químico", "1 colher (café) rasa de fermento em pó"],
         "Preparo": "Bata até atingir forma adequada"
     }
-
 
 @pytest.fixture
 def mock_mongo_collection():
@@ -52,12 +55,29 @@ def test_client(mock_mongo_db, monkeypatch):
 
     yield client
 
+@pytest.fixture
+def test_client_no_db(monkeypatch):
+    monkeypatch.setattr('recipe.routes.recipe.db', None)  
+    client = TestClient(app)
 
-def test_create_recipe(test_client, mock_mongo_collection):
+    yield client
+
+
+def test_create_recipe_success(test_client, mock_mongo_collection):
     response = test_client.post("/recipe/createRecipes", json=single_recipe)
     assert response.status_code == 200
     assert response.json() == {
         "message": "Recipe created successfully", 
         "recipe": single_recipe}
+    # Testa se função mockada foi chamada uma vez com o devido parâmetro
     mock_mongo_collection.find_one.assert_awaited_once_with({"Nome": single_recipe["Nome"]})
     mock_mongo_collection.insert_one.assert_awaited_once_with(single_recipe)
+
+def test_create_recipe_error_no_connection(test_client_no_db):
+    
+    response = test_client_no_db.post("/recipe/createRecipes", json=single_recipe)
+    assert response.status_code == 500
+    assert response.json() == {"detail": "Database connection error"}
+
+    
+    
