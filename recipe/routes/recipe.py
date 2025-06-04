@@ -11,25 +11,23 @@ router = APIRouter(
 )
 
 @router.post("/createRecipes")
-async def create_recipe(recipe: Recipe):
-    # Vinícius:
-    ## Testar:
-    ### (!) Receita já existe (mesmo nome);
+def create_recipe(recipe: Recipe):
+    
     if db is None:
         raise HTTPException(status_code=500, detail="Database connection error")
     recipes_collection = db["recipes"]
 
-    duplicate_recipe = await recipes_collection.find_one({"Nome": recipe.Nome})
+    duplicate_recipe = recipes_collection.find_one({"Nome": recipe.Nome})
 
     if duplicate_recipe:
         raise HTTPException(status_code=400, detail="Recipe with this name already exists")
     
-    await recipes_collection.insert_one(recipe.model_dump())
+    recipes_collection.insert_one(recipe.model_dump())
     return {"message": "Recipe created successfully", "recipe": recipe}
 
 
 @router.get("/getRecipes")
-async def get_recipes(name: Optional[str] = Query(None, description="Optional name filter for recipes")):
+def get_recipes(name: Optional[str] = Query(None, description="Optional name filter for recipes")):
     # JP:
     ## Implementar:
     ### (!) Validação extra para garantir que name é uma string não vazia ou tipo incompatível;
@@ -59,13 +57,17 @@ async def get_recipes(name: Optional[str] = Query(None, description="Optional na
 def get_recipes_by_one(ingrediente: str):
     # Vinícius:
     ## Implementar:
-    ### (!) Validação extra para garantir que ingrediente é uma string não vazia;
-    ### (!) Verificar se db é None;
     ## Testar:
     ### (!) Retorno de lista de receitas filtradas por ingrediente;
     ### (!) db == None;
     ### (!) ingrediente inválido (ex: número, string vazia, etc).
     
+    if ingrediente is None or not isinstance(ingrediente, str) or ingrediente.strip() == "":
+        raise HTTPException(status_code=400, detail="Invalid ingredient parameter")
+
+    if db is None:
+        raise HTTPException(status_code=500, detail="Database connection error")
+
     # como é uma str e não uma list usa regex   
     # aceitar plural
     print("procura de acordo com um item")                                               
@@ -76,7 +78,7 @@ def get_recipes_by_one(ingrediente: str):
         item["id"] = str(item["_id"])
         item.pop("_id")
         items.append(item)
-    return items
+    return { "recipes": items }
 
 
 #usar o método post, porque get não suportou entrada de dados mais complexos como listas
@@ -112,7 +114,7 @@ def get_recipes_by_all(ingredients : list[str]):
     if not items:
         raise HTTPException(status_code=404, detail="Não há receitas com todos esses ingredientes.")
     return {
-        "recipies" : items
+        "recipes" : items
     }
 
     #se não tiver receitas com todos os ingredientes, buscar uma que tenha alguns deles (operador "$or")
@@ -147,7 +149,7 @@ def get_recipes_by_some(ingredients : list[str]):
     if some_items:
         return JSONResponse(content={
         "message": "Não há receitas com todos os ingredientes. Mostrando receitas com alguns deles.",
-        "recipies": some_items
+        "recipes": some_items
     })
 
     raise HTTPException(status_code=404, detail="Não há receitas com nenhum desses ingredientes.")
