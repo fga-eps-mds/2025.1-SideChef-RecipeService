@@ -12,6 +12,9 @@ router = APIRouter(
 
 @router.post("/createRecipes")
 async def create_recipe(recipe: Recipe):
+    # Vinícius:
+    ## Testar:
+    ### (!) Receita já existe (mesmo nome);
     if db is None:
         raise HTTPException(status_code=500, detail="Database connection error")
     recipes_collection = db["recipes"]
@@ -27,6 +30,15 @@ async def create_recipe(recipe: Recipe):
 
 @router.get("/getRecipes")
 async def get_recipes(name: Optional[str] = Query(None, description="Optional name filter for recipes")):
+    # JP:
+    ## Implementar:
+    ### (!) Validação extra para garantir que name é uma string não vazia ou tipo incompatível;
+    ## Testar:
+    ### (!) Retorno de lista de receitas;
+    ### (!) db == None;
+    ### (!) name == None ou name == ""; 
+    
+    # Simular db
     if db is None:
         raise HTTPException(status_code=500, detail="Database connection error")
 
@@ -34,6 +46,7 @@ async def get_recipes(name: Optional[str] = Query(None, description="Optional na
 
     query = {"Nome": name} if name else {}
 
+    # Simular find
     recipes = list(recipes_collection.find(query))
 
     for recipe in recipes:
@@ -43,9 +56,20 @@ async def get_recipes(name: Optional[str] = Query(None, description="Optional na
 
 
 @router.get("/oneIngredient")
-def get_recipes_by_one(ingrediente : str):
-                                #como é uma str e não uma list usa regex     #aceitar plural
-    print("procura de acordo com um item")                                               #case insensitive
+def get_recipes_by_one(ingrediente: str):
+    # Vinícius:
+    ## Implementar:
+    ### (!) Validação extra para garantir que ingrediente é uma string não vazia;
+    ### (!) Verificar se db é None;
+    ## Testar:
+    ### (!) Retorno de lista de receitas filtradas por ingrediente;
+    ### (!) db == None;
+    ### (!) ingrediente inválido (ex: número, string vazia, etc).
+    
+    # como é uma str e não uma list usa regex   
+    # aceitar plural
+    print("procura de acordo com um item")                                               
+    # case insensitive
     query = db["recipes"].find({"Ingredientes": {"$regex": fr"\b{ingrediente}a*o*s*\b", "$options": "i"}})        
     items = []
     for item in query:
@@ -58,6 +82,15 @@ def get_recipes_by_one(ingrediente : str):
 #usar o método post, porque get não suportou entrada de dados mais complexos como listas
 @router.post("/allIngredients")
 def get_recipes_by_all(ingredients : list[str]):
+    # Vinícius:
+    ## Implementar:
+    ### (!) Validação extra para garantir o parâmetro tipado;
+    ### (!) Verificar se db é None;
+    ### (?) Excluir erro 404 caso não encontre receitas;
+    ## Testar:
+    ### (!) Retorno de lista de receitas filtradas por todos os ingredientes;
+    ### (!) db == None;
+    ### (!) ingredientes inválidos (ex: número, string vazia, etc).
 
     #garantir que não tem nenhum espaço em branco
     ingredientsList = [item.strip() for item in ingredients]
@@ -85,6 +118,15 @@ def get_recipes_by_all(ingredients : list[str]):
     #se não tiver receitas com todos os ingredientes, buscar uma que tenha alguns deles (operador "$or")
 @router.post("/SomeIngredients")
 def get_recipes_by_some(ingredients : list[str]):
+    # ... :
+    ## Implementar:
+    ### (!) Validação extra para garantir o parâmetro tipado;
+    ### (!) Verificar se db é None;
+    ### (?) Excluir erro 404 caso não encontre receitas;
+    ## Testar:
+    ### (!) Retorno de lista de receitas filtradas por todos os ingredientes;
+    ### (!) db == None;
+    ### (!) ingredientes inválidos (ex: número, string vazia, etc).
 
     #garantir que não tem nenhum espaço em branco
     ingredientsList = [item.strip() for item in ingredients]
