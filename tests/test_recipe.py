@@ -120,7 +120,16 @@ def test_client_no_db(monkeypatch):
     client = TestClient(app)
 
     yield client
+    # Ver se funciona
+    
+    response = test_client.get("/recipe/allIngredients", params={"ingredients": ["leite", "banana"]})
 
+    assert response.status_code == 200
+    recipes = response.json()
+    assert len(recipes) == 1
+    assert recipes[0]["Nome"] == "Milk Shake de Banana"
+
+    mock_mongo_collection.find.assert_called_once_with({"Nome": "Milk Shake de Banana"})
 
 def test_create_recipe_success(test_client, mock_mongo_collection):
     response = test_client.post("/recipe/createRecipes", json=MockData.input_recipe)
@@ -175,11 +184,13 @@ def test_filter_one_ingredient_empty_value(test_client):
     ...
 
 def test_get_recipes_by_all_ingredients(test_client, mock_mongo_collection):
-    response = test_client.get("/recipe/allIngredients", params={"ingredients": ["leite", "banana"]})
+    ...
 
-    assert response.status_code == 200
-    recipes = response.json()
-    assert len(recipes) == 1
-    assert recipes[0]["Nome"] == "Milk Shake de Banana"
+def test_get_recipes_by_all_ingredients_no_connection(test_client_no_db):
+    ...
 
-    mock_mongo_collection.find.assert_called_once_with({"Nome": "Milk Shake de Banana"})
+def test_get_recipes_by_all_ingredients_empty_value(test_client):
+    ...
+
+def test_get_recipes_by_all_ingredients_invalid_value(test_client, mock_mongo_collection):
+    ...
