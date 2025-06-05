@@ -1,5 +1,7 @@
 from typing import Dict
 from collections import OrderedDict
+import re
+import random
 
 import pytest
 from fastapi.testclient import TestClient
@@ -13,29 +15,36 @@ from recipe.models.recipe import Recipe
 # Side effect de Mocks executa uma função atribuída ao chamar o objeto;
 
 class MockData:
-    def make_recipe(name: str, recipe_type: str, difficulty: str, ingredients: list, preparation: str) -> OrderedDict:
-        return Recipe(
+    def make_recipe(id: str, name: str, recipe_type: str, difficulty: str, ingredients: list, preparation: str) -> Dict:
+        id = id
+        recipe = Recipe(
+            _id=id,
             Nome=name,
             Tipo=recipe_type,
             Dificuldade=difficulty,
             Ingredientes=ingredients,
             Preparo=preparation
         ).model_dump()
+        recipe["_id"] = str(id) 
+        return recipe
     
-    single_recipe = Recipe(
-        Nome="Bolo de Cenoura",
-        Tipo="Doce",                    
-        Dificuldade="Fácil",
-        Ingredientes=["cenoura", "açúcar", "farinha"],
-        Preparo="Bata tudo no liquidificador e leve ao forno por 30 minutos"
-    ).model_dump()
+    input_recipe = {
+        "Nome": "Bolo de Cenoura",
+        "Tipo": "Doce",
+        "Dificuldade": "Fácil",
+        "Ingredientes": ["cenoura", "açúcar", "farinha"],
+        "Preparo": "Bata tudo no liquidificador e leve ao forno por 30 minutos"
+    }
         
-    existing_recipe = Recipe(
-        Nome="Milk Shake de Banana",
-        Tipo="Bebida Gelada",
-        Dificuldade="Fácil",
-        Ingredientes=["leite", "banana"],
-        Preparo="Bata tudo no liquidificador").model_dump()
+    existing_recipe = make_recipe(
+        id=str(random.randint(1, 1000)),
+        name= "Milk Shake de Banana",
+        recipe_type="Bebida Gelada",
+        difficulty="Fácil",
+        ingredients=["leite", "banana"],
+        preparation="Bata tudo no liquidificador"
+
+    )
     
 @pytest.fixture
 def mock_mongo_collection():
@@ -44,12 +53,14 @@ def mock_mongo_collection():
     collection._mock_data = [
         MockData.existing_recipe,
         MockData.make_recipe(
+            id=str(random.randint(1, 1000)),
             name="Milk Shake de Morango",
             recipe_type="Bebida Gelada",
             difficulty="Fácil",
             ingredients=["leite", "morango"],
             preparation="Bata tudo no liquidificador"
         ), MockData.make_recipe(
+            id=str(random.randint(1, 1000)),
             name="Bolo de Chocolate",
             recipe_type="Doce",
             difficulty="Fácil",
@@ -64,11 +75,21 @@ def mock_mongo_collection():
                 return doc.copy()
         return None
     
-    def mock_find(query: str = None, **kwargs):
+    def mock_find(query: dict = None, **kwargs):
         if not query:
             return collection._mock_data
-        return [doc for doc in collection._mock_data if query in doc.get("Ingredientes", [])]
-
+        ingredientes_filter = query.get("Ingredientes", {})
+        regex = ingredientes_filter.get("$regex")
+        options = ingredientes_filter.get("$options", "")
+        if regex:
+            flags = re.IGNORECASE if "i" in options else 0
+            pattern = re.compile(regex, flags)
+            result = []
+            for doc in collection._mock_data:
+                if any(pattern.search(ing) for ing in doc.get("Ingredientes", [])):
+                    result.append(doc)
+            return result
+        return []
 
     collection.find_one = MagicMock(side_effect=mock_find_one)
 
@@ -102,20 +123,20 @@ def test_client_no_db(monkeypatch):
 
 
 def test_create_recipe_success(test_client, mock_mongo_collection):
-    response = test_client.post("/recipe/createRecipes", json=MockData.single_recipe)
-    single_recipe = MockData.single_recipe
+    response = test_client.post("/recipe/createRecipes", json=MockData.input_recipe)
+    input_recipe = MockData.input_recipe
 
     assert response.status_code == 200
     assert response.json() == {
         "message": "Recipe created successfully", 
-        "recipe": single_recipe}
+        "recipe": input_recipe}
     # Testa se função mockada foi chamada uma vez com o devido parâmetro
-    mock_mongo_collection.find_one.assert_called_once_with({"Nome": single_recipe["Nome"]})
-    mock_mongo_collection.insert_one.assert_called_once_with(single_recipe)
+    mock_mongo_collection.find_one.assert_called_once_with({"Nome": input_recipe["Nome"]})
+    mock_mongo_collection.insert_one.assert_called_once_with(input_recipe)
 
 def test_create_recipe_error_no_connection(test_client_no_db):
     
-    response = test_client_no_db.post("/recipe/createRecipes", json=MockData.single_recipe)
+    response = test_client_no_db.post("/recipe/createRecipes", json=MockData.input_recipe)
     assert response.status_code == 500
     assert response.json() == {"detail": "Database connection error"}
 
