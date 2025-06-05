@@ -55,15 +55,6 @@ def get_recipes(name: Optional[str] = Query(None, description="Optional name fil
 
 @router.get("/oneIngredient")
 def get_recipes_by_one(ingrediente: str):
-    # Vinícius:
-    ## Implementar:
-    ## Testar:
-    ### (!) Retorno de lista de receitas filtradas por ingrediente;
-    ### (!) db == None;
-    ### (!) ingrediente inválido (ex: número, string vazia, etc).
-    
-    if ingrediente is None or not isinstance(ingrediente, str) or ingrediente.strip() == "":
-        raise HTTPException(status_code=400, detail="Invalid ingredient parameter")
 
     if db is None:
         raise HTTPException(status_code=500, detail="Database connection error")
