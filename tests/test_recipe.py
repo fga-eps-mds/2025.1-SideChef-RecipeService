@@ -170,3 +170,16 @@ def test_filter_one_ingredient_no_connection(test_client_no_db):
 
     assert response.status_code == 500
     assert response.json() == {"detail": "Database connection error"}
+
+def test_filter_one_ingredient_empty_value(test_client):
+    ...
+
+def test_get_recipes_by_all_ingredients(test_client, mock_mongo_collection):
+    response = test_client.get("/recipe/allIngredients", params={"ingredients": ["leite", "banana"]})
+
+    assert response.status_code == 200
+    recipes = response.json()
+    assert len(recipes) == 1
+    assert recipes[0]["Nome"] == "Milk Shake de Banana"
+
+    mock_mongo_collection.find.assert_called_once_with({"Nome": "Milk Shake de Banana"})
