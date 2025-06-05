@@ -164,3 +164,9 @@ def test_filter_one_ingredient(test_client, mock_mongo_collection):
     mock_mongo_collection.find.assert_called_once_with({
         "Ingredientes": {"$regex": fr"\bleitea*o*s*\b", "$options": "i"}
     })
+
+def test_filter_one_ingredient_no_connection(test_client_no_db):
+    response = test_client_no_db.get("/recipe/oneIngredient", params={"ingrediente": "leite"})
+
+    assert response.status_code == 500
+    assert response.json() == {"detail": "Database connection error"}
