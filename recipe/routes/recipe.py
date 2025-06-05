@@ -77,13 +77,16 @@ def get_recipes_by_one(ingrediente: str):
 def get_recipes_by_all(ingredients : list[str]):
     # Vinícius:
     ## Implementar:
-    ### (!) Validação extra para garantir o parâmetro tipado;
-    ### (!) Verificar se db é None;
-    ### (?) Excluir erro 404 caso não encontre receitas;
     ## Testar:
     ### (!) Retorno de lista de receitas filtradas por todos os ingredientes;
     ### (!) db == None;
     ### (!) ingredientes inválidos (ex: número, string vazia, etc).
+
+    if db is None:
+        raise HTTPException(status_code=500, detail="Database connection error")
+
+    if not isinstance(ingredients, list) or not all(isinstance(item, str) for item in ingredients):
+        raise HTTPException(status_code=400, detail="Invalid ingredients format. Expected a list of strings.")
 
     #garantir que não tem nenhum espaço em branco
     ingredientsList = [item.strip() for item in ingredients]
@@ -102,8 +105,7 @@ def get_recipes_by_all(ingredients : list[str]):
         item.pop("_id")
         items.append(item)
 
-    if not items:
-        raise HTTPException(status_code=404, detail="Não há receitas com todos esses ingredientes.")
+    
     return {
         "recipes" : items
     }
