@@ -58,6 +58,9 @@ def get_recipes_by_one(ingrediente: str):
 
     if db is None:
         raise HTTPException(status_code=500, detail="Database connection error")
+    
+    if not isinstance(ingrediente, str) or not ingrediente.strip():
+        raise HTTPException(status_code=400, detail="Invalid ingredient format. Expected a non-empty string.")
 
     # como é uma str e não uma list usa regex   
     # aceitar plural
