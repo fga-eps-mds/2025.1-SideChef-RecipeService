@@ -50,7 +50,10 @@ def get_recipes(name: Optional[str] = Query(None, description="Optional name fil
     for recipe in recipes:
         recipe["_id"] = str(recipe["_id"])
 
-    return recipes
+    return {
+        "recipes": recipes 
+    }
+
 
 
 @router.get("/oneIngredient")
