@@ -32,7 +32,7 @@ async def get_recipes(name: Optional[str] = Query(None, description="Optional na
 
     recipes_collection = db["recipes"]
 
-    query = {"name": name} if name else {}
+    query = {"Nome": name} if name else {}
 
     recipes = list(recipes_collection.find(query))
 
