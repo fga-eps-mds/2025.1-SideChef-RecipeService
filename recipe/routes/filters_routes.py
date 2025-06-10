@@ -24,7 +24,7 @@ def all_ingredients(ingredients : list[str]):
     #create a list with the queries for each ingredient in the list
     filters = []
     for item in ingredients_list:
-        f = {"Ingredientes.ingrediente": {"$regex": fr"\b{item}a*o*s*\b", "$options": "i"}}
+        f = {"Ingredientes.ingrediente": {"$regex": fr"^{item}(s)?$", "$options": "i"}}
         filters.append(f)
 
     #search for recipes with all ingredients (operator "$and")
