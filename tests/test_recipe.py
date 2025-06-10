@@ -299,3 +299,86 @@ def test_get_recipes_empty_collection(test_client, mock_mongo_collection):
     mock_mongo_collection.find.assert_called_once_with({})
 
     mock_mongo_collection._mock_data.extend(original_data)
+
+## testes someIngredients
+
+def test_get_recipes_by_some_ingredients_success(test_client, mock_mongo_collection):
+    
+    response = test_client.post("/recipe/someIngredients", json=["leite", "chocolate"])
+
+    assert response.status_code == 200
+    response_data = response.json()
+    recipes = response_data.get("recipes", [])
+
+    assert response_data["message"] == "receitas encontradas contendo algum dos ingredientes"
+    assert len(recipes) == 3 
+
+    expected_or_query = {
+        "$or": [
+            {"Ingredientes": {"$regex": fr"\bleitea*o*s*\b", "$options": "i"}},
+            {"Ingredientes": {"$regex": fr"\bchocolatea*o*s*\b", "$options": "i"}}
+        ]
+    }
+    mock_mongo_collection.find.assert_called_once_with(expected_or_query)
+
+def test_get_recipes_by_some_ingredients_not_found(test_client, mock_mongo_collection):
+    
+    response = test_client.post("/recipe/someIngredients", json=["jiló", "abacate"])
+
+    assert response.status_code == 200
+    response_data = response.json()
+    recipes = response_data.get("recipes", [])
+
+    assert response_data["message"] == "nao há receitas com nenhum desses ingredientes"
+    assert recipes == []
+
+    expected_or_query = {
+        "$or": [
+            {"Ingredientes": {"$regex": fr"\bjilóa*o*s*\b", "$options": "i"}},
+            {"Ingredientes": {"$regex": fr"\babacatea*o*s*\b", "$options": "i"}}
+        ]
+    }
+    mock_mongo_collection.find.assert_called_once_with(expected_or_query)
+
+
+def test_get_recipes_by_some_ingredients_no_connection(test_client_no_db):
+
+    response = test_client_no_db.post("/recipe/someIngredients", json=["leite"])
+
+    assert response.status_code == 500
+    assert response.json() == {"detail": "Database connection error"}
+
+
+def test_get_recipes_by_some_ingredients_invalid_value(test_client):
+  
+    response = test_client.post("/recipe/someIngredients", json=[1, 2, 3])
+
+    assert response.status_code == 422
+
+
+def test_get_recipes_by_some_ingredients_empty_list(test_client, mock_mongo_collection):
+
+    response = test_client.post("/recipe/someIngredients", json=[])
+
+    assert response.status_code == 200
+    response_data = response.json()
+    
+    assert response_data["message"] == "nenhum ingrediente valido fornecido para a busca"
+    assert response_data["recipes"] == []
+
+    mock_mongo_collection.find.assert_not_called()
+
+def test_get_recipes_by_some_ingredients_empty_strings(test_client, mock_mongo_collection):
+
+    response = test_client.post("/recipe/someIngredients", json=["", "   ", "\t"])
+
+    assert response.status_code == 200
+    response_data = response.json()
+    
+    assert response_data["message"] == "nenhum ingrediente valido fornecido para a busca"
+    assert response_data["recipes"] == []
+
+    mock_mongo_collection.find.assert_not_called()
+
+
+## _success / _empty_list / _string with errors ;

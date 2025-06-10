@@ -117,20 +117,49 @@ def get_recipes_by_all(ingredients : list[str]):
     }
 
     #se não tiver receitas com todos os ingredientes, buscar uma que tenha alguns deles (operador "$or")
-@router.post("/SomeIngredients")
+@router.post("/someIngredients")
 def get_recipes_by_some(ingredients : list[str]):
-    # ... :
-    ## Implementar:
-    ### (!) Validação extra para garantir o parâmetro tipado;
-    ### (!) Verificar se db é None;
-    ### (?) Excluir erro 404 caso não encontre receitas;
-    ## Testar:
-    ### (!) Retorno de lista de receitas filtradas por todos os ingredientes;
-    ### (!) db == None;
-    ### (!) ingredientes inválidos (ex: número, string vazia, etc).
 
-    #garantir que não tem nenhum espaço em branco
-    ingredientsList = [item.strip() for item in ingredients]
+    if db is None:
+        raise HTTPException(status_code=500, detail="Database connection error")
+
+    ingredientsList = [item.strip() for item in ingredients if item and item.strip()]
+
+    if not ingredientsList:
+        return JSONResponse(
+            status_code=200,
+            content={
+                "message": "Nenhum ingrediente válido fornecido para a busca.",
+                "recipes": []
+            }
+        )
+    
+    recipes_collection = db["recipes"]
+    filters = []
+    for item in ingredientsList:
+        f = {"Ingredientes": {"$regex": fr"\b{item}a*o*s*\b", "$options": "i"}}
+        filters.append(f)
+
+    or_query = recipes_collection.find({"$or": filters})
+
+    some_items = []
+    for item in or_query:
+        item["id"] = str(item["_id"])
+        item.pop("_id")
+        some_items.append(item)
+
+    if not some_items:
+        message = "nao há receitas com nenhum desses ingredientes"
+    else:
+        message = "receitas encontradas contendo algum dos ingredientes."
+
+    return JSONResponse(
+        status_code=200,
+        content={
+            "message": message,
+            "recipes": some_items
+        }
+    )
 
     filters = []
     for item in ingredientsList:
