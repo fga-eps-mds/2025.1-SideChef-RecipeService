@@ -108,11 +108,19 @@ def get_recipes_by_all(ingredients : list[str]):
     #garantir que não tem nenhum espaço em branco
     ingredientsList = [item.strip() for item in ingredients]
     if not ingredientsList:
-        raise HTTPException(status_code=200, detail="There is no recipe with such ingredients")
+        return {
+            "recipes" : [],
+            "message" : "There is no recipes with such ingredients"
+        }
 
     #criar um lista com as querys de cada ingrediente da lista
     filters = []
     for item in ingredientsList:
+        if item in ["", "   ", "\t"]:
+            return {
+                "recipes" : [],
+                "message" : "There is no recipes with such ingredients"
+            }
         f = {"Ingredientes": {"$regex": fr"\b{item}a*o*s*\b", "$options": "i"}}
         filters.append(f)
 
