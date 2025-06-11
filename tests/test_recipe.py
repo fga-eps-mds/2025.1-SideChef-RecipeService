@@ -246,23 +246,39 @@ def test_get_recipes_by_all_ingredients_success(test_client, mock_mongo_collecti
     response = test_client.post("/recipe/allIngredients", json=["leite", "banana"])
     assert response.status_code == 200
     recipes = response.json().get("recipes")
+    assert response.json().get("message") == "Found recipes with all ingredients"
     assert len(recipes) == 1
     assert recipes[0]["Nome"] == "Milk Shake de Banana"
 
+    expected_and_query = {
+        "$and": [
+            {"Ingredientes": {"$regex": fr"\bleitea*o*s*\b", "$options": "i"}},
+            {"Ingredientes": {"$regex": fr"\bbananaa*o*s*\b", "$options": "i"}}
+        ]
+    }
 
-def test_get_recipes_by_all_ingredients_no_connection(test_client_no_db):
+    mock_mongo_collection.find.assert_called_once_with(expected_and_query)
+
+
+def test_get_recipes_by_all_ingredients_no_connection(test_client_no_db, mock_mongo_collection):
     response = test_client_no_db.post("/recipe/allIngredients", json=["leite", "banana"])
     assert response.status_code == 500
     assert response.json() == {"detail": "Database connection error"}
+    mock_mongo_collection.find.assert_not_called()
 
 
-def test_get_recipes_by_all_ingredients_empty_value(test_client):
-    # response = test_client.post("/recipe/allIngredients", json=["", "   ", "\t"])
-    # assert response.status_code == 200
-    ...
+def test_get_recipes_by_all_ingredients_empty_value(test_client, mock_mongo_collection):
+    response = test_client.post("/recipe/allIngredients", json=["", "   ", "\t"])
+    assert response.status_code == 200
+    assert response.json()["recipes"] == []
+    assert response.json()["message"] == "There is no recipes with such ingredients"
+    mock_mongo_collection.find.assert_not_called()
 
 def test_get_recipes_by_all_ingredients_invalid_value(test_client, mock_mongo_collection):
-    ...
+    response = test_client.post("/recipe/allIngredients", json=[1, 2, 3])
+    assert response.status_code == 422
+    mock_mongo_collection.find.assert_not_called()
+
 
 
 def test_get_recipes_no_filter(test_client, mock_mongo_collection):
