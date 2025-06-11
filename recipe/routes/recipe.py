@@ -44,16 +44,19 @@ def get_recipes(name: Optional[str] = Query(None, description="Optional name fil
 
     query = {"Nome": name} if name else {}
 
-    # Simular find
     recipes = list(recipes_collection.find(query))
 
     for recipe in recipes:
         recipe["_id"] = str(recipe["_id"])
 
-    return {
-        "recipes": recipes 
-    }
+    message = "Found recipes with query"
 
+    if len(recipes) == 0:
+        message = "There is no recipes with query"
+    return {
+        "recipes" : recipes,
+        "message" : message 
+    }
 
 
 @router.get("/oneIngredient")
@@ -75,7 +78,15 @@ def get_recipes_by_one(ingrediente: str):
         item["id"] = str(item["_id"])
         item.pop("_id")
         items.append(item)
-    return { "recipes": items }
+    
+    message = "Found recipes with ingredient"
+
+    if len(items) == 0:
+        message = "There is no recipes with ingredient"
+    return {
+        "recipes" : items,
+        "message" : message 
+    }
 
 
 #usar o método post, porque get não suportou entrada de dados mais complexos como listas
@@ -96,6 +107,8 @@ def get_recipes_by_all(ingredients : list[str]):
 
     #garantir que não tem nenhum espaço em branco
     ingredientsList = [item.strip() for item in ingredients]
+    if not ingredientsList:
+        raise HTTPException(status_code=200, detail="There is no recipe with such ingredients")
 
     #criar um lista com as querys de cada ingrediente da lista
     filters = []
@@ -111,9 +124,13 @@ def get_recipes_by_all(ingredients : list[str]):
         item.pop("_id")
         items.append(item)
 
-    
+    message = "Found recipes with all ingredients"
+
+    if len(items) == 0:
+        message = "There is no recipes with such ingredients"
     return {
-        "recipes" : items
+        "recipes" : items,
+        "message" : message 
     }
 
     #se não tiver receitas com todos os ingredientes, buscar uma que tenha alguns deles (operador "$or")
