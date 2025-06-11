@@ -129,7 +129,7 @@ def get_recipes_by_some(ingredients : list[str]):
         return JSONResponse(
             status_code=200,
             content={
-                "message": "Nenhum ingrediente válido fornecido para a busca.",
+                "message": "No valid ingredient as query",
                 "recipes": []
             }
         )
@@ -149,9 +149,9 @@ def get_recipes_by_some(ingredients : list[str]):
         some_items.append(item)
 
     if not some_items:
-        message = "nao há receitas com nenhum desses ingredientes"
+        message = "There is no recipe with such ingredients"
     else:
-        message = "receitas encontradas contendo algum dos ingredientes."
+        message = "Found recipes with some ingredients"
 
     return JSONResponse(
         status_code=200,
@@ -160,24 +160,3 @@ def get_recipes_by_some(ingredients : list[str]):
             "recipes": some_items
         }
     )
-
-    filters = []
-    for item in ingredientsList:
-        f = {"Ingredientes": {"$regex": fr"\b{item}a*o*s*\b", "$options": "i"}}
-        filters.append(f)
-
-
-    or_query = db["recipes"].find({"$or": filters})
-    some_items = []
-    for item in or_query:
-        item["id"] = str(item["_id"])
-        item.pop("_id")
-        some_items.append(item)
-
-    if some_items:
-        return JSONResponse(content={
-        "message": "Não há receitas com todos os ingredientes. Mostrando receitas com alguns deles.",
-        "recipes": some_items
-    })
-
-    raise HTTPException(status_code=404, detail="Não há receitas com nenhum desses ingredientes.")
