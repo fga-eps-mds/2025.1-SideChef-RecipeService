@@ -257,6 +257,8 @@ def test_get_recipes_by_all_ingredients_no_connection(test_client_no_db):
 
 
 def test_get_recipes_by_all_ingredients_empty_value(test_client):
+    # response = test_client.post("/recipe/allIngredients", json=["", "   ", "\t"])
+    # assert response.status_code == 200
     ...
 
 def test_get_recipes_by_all_ingredients_invalid_value(test_client, mock_mongo_collection):
@@ -269,6 +271,7 @@ def test_get_recipes_no_filter(test_client, mock_mongo_collection):
     assert response.status_code == 200
     expected_data = [doc.copy() for doc in mock_mongo_collection._mock_data]
     assert response.json()["recipes"] == expected_data
+    assert response.json()["message"] == "Found recipes with query"
 
     mock_mongo_collection.find.assert_called_once_with({})
 
@@ -284,7 +287,8 @@ def test_get_recipes_with_name_filter_found(test_client, mock_mongo_collection):
         if doc["Nome"] == name_to_filter:
             expected_data.append(doc)
     assert response.json()["recipes"] == expected_data
-    assert len(response.json()) == 1
+    assert response.json()["message"] == "Found recipes with query"
+    assert len(response.json()["recipes"]) == 1
     mock_mongo_collection.find.assert_called_once_with({"Nome": name_to_filter})
 
 
@@ -294,6 +298,7 @@ def test_get_recipes_with_name_filter_not_found(test_client, mock_mongo_collecti
 
     assert response.status_code == 200
     assert response.json()["recipes"] == []
+    assert response.json()["message"] == "There is no recipes with query"
 
     mock_mongo_collection.find.assert_called_once_with({"Nome": name_to_filter})
 
@@ -305,6 +310,7 @@ def test_get_recipes_empty_collection(test_client, mock_mongo_collection):
 
     assert response.status_code == 200
     assert response.json()["recipes"] == []
+    assert response.json()["message"] == "There is no recipes with query"
 
     mock_mongo_collection.find.assert_called_once_with({})
 
