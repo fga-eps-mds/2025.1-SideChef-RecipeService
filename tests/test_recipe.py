@@ -251,7 +251,10 @@ def test_get_recipes_by_all_ingredients_success(test_client, mock_mongo_collecti
 
 
 def test_get_recipes_by_all_ingredients_no_connection(test_client_no_db):
-    ...
+    response = test_client_no_db.post("/recipe/allIngredients", json=["leite", "banana"])
+    assert response.status_code == 500
+    assert response.json() == {"detail": "Database connection error"}
+
 
 def test_get_recipes_by_all_ingredients_empty_value(test_client):
     ...
