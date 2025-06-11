@@ -102,9 +102,6 @@ def get_recipes_by_all(ingredients : list[str]):
     if db is None:
         raise HTTPException(status_code=500, detail="Database connection error")
 
-    if not isinstance(ingredients, list) or not all(isinstance(item, str) for item in ingredients):
-        raise HTTPException(status_code=400, detail="Invalid ingredients format. Expected a list of strings.")
-
     #garantir que não tem nenhum espaço em branco
     ingredientsList = [item.strip() for item in ingredients]
     if not ingredientsList:
