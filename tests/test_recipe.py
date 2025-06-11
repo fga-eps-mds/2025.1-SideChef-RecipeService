@@ -111,23 +111,27 @@ def mock_mongo_collection():
             return collection._mock_data
         recipes = []
         query_all = query.get("$and")
-        # query_some = query.get("$or")
+        query_some = query.get("$or")
         query_name = query.get("Nome")
 
-        if query_all:
+        if query_all != None and isinstance(query_all, list):
             for data in collection._mock_data:
                 ingredientes = data.get("Ingredientes", [])
+                if ingredientes is None:
+                    ingredientes = []
                 if all(any(compile_pattern(f).match(ing) for ing in ingredientes) for f in query_all):
                     recipes.append(data)
             return recipes
-        # if query_some:
-        #     for data in collection._mock_data:
-        #         ingredientes = data.get("Ingredientes", [])
-        #         if any(any(compile_pattern(f).match(ing) for ing in ingredientes) for f in query_all):
-        #             recipes.append(data)
-        #     return recipes
+        if query_some != None and isinstance(query_some, list):
+            for data in collection._mock_data:
+                ingredientes = data.get("Ingredientes", [])
+                if ingredientes is None:
+                    ingredientes = []
+                if any(any(compile_pattern(f).match(ing) for ing in ingredientes) for f in query_some):
+                    recipes.append(data)
+            return recipes
 
-        if query_name:
+        if query_name != None:
             for doc in collection._mock_data:
                 if doc.get("Nome") == query_name:
                     recipes.append(doc)
@@ -141,7 +145,10 @@ def mock_mongo_collection():
             pattern = re.compile(regex, flags)
             result = []
             for doc in collection._mock_data:
-                if any(pattern.search(ing) for ing in doc.get("Ingredientes", [])):
+                ings = doc.get("Ingredientes", [])
+                if ings is None:
+                    ings = []
+                if any(pattern.search(ing) for ing in ings):
                     result.append(doc)
             return result
         return []
@@ -310,7 +317,7 @@ def test_get_recipes_by_some_ingredients_success(test_client, mock_mongo_collect
     response_data = response.json()
     recipes = response_data.get("recipes", [])
 
-    assert response_data["message"] == "receitas encontradas contendo algum dos ingredientes"
+    assert response_data["message"] == "Found recipes with some ingredients"
     assert len(recipes) == 3 
 
     expected_or_query = {
@@ -329,7 +336,7 @@ def test_get_recipes_by_some_ingredients_not_found(test_client, mock_mongo_colle
     response_data = response.json()
     recipes = response_data.get("recipes", [])
 
-    assert response_data["message"] == "nao há receitas com nenhum desses ingredientes"
+    assert response_data["message"] == "There is no recipe with such ingredients"
     assert recipes == []
 
     expected_or_query = {
@@ -348,7 +355,7 @@ def test_get_recipes_by_some_ingredients_no_connection(test_client_no_db):
     assert response.status_code == 500
     assert response.json() == {"detail": "Database connection error"}
 
-
+# Avaliar
 def test_get_recipes_by_some_ingredients_invalid_value(test_client):
   
     response = test_client.post("/recipe/someIngredients", json=[1, 2, 3])
@@ -363,7 +370,7 @@ def test_get_recipes_by_some_ingredients_empty_list(test_client, mock_mongo_coll
     assert response.status_code == 200
     response_data = response.json()
     
-    assert response_data["message"] == "nenhum ingrediente valido fornecido para a busca"
+    assert response_data["message"] == "No valid ingredient as query"
     assert response_data["recipes"] == []
 
     mock_mongo_collection.find.assert_not_called()
@@ -375,7 +382,7 @@ def test_get_recipes_by_some_ingredients_empty_strings(test_client, mock_mongo_c
     assert response.status_code == 200
     response_data = response.json()
     
-    assert response_data["message"] == "nenhum ingrediente valido fornecido para a busca"
+    assert response_data["message"] == "No valid ingredient as query"
     assert response_data["recipes"] == []
 
     mock_mongo_collection.find.assert_not_called()
