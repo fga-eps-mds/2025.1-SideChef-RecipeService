@@ -28,13 +28,6 @@ def create_recipe(recipe: Recipe):
 
 @router.get("/getRecipes")
 def get_recipes(name: Optional[str] = Query(None, description="Optional name filter for recipes")):
-    # JP:
-    ## Implementar:
-    ### (!) Validação extra para garantir que name é uma string não vazia ou tipo incompatível;
-    ## Testar:
-    ### (!) Retorno de lista de receitas;
-    ### (!) db == None;
-    ### (!) name == None ou name == ""; 
     
     # Simular db
     if db is None:
@@ -92,12 +85,6 @@ def get_recipes_by_one(ingrediente: str):
 #usar o método post, porque get não suportou entrada de dados mais complexos como listas
 @router.post("/allIngredients")
 def get_recipes_by_all(ingredients : list[str]):
-    # Vinícius:
-    ## Implementar:
-    ## Testar:
-    ### (!) Retorno de lista de receitas filtradas por todos os ingredientes;
-    ### (!) db == None;
-    ### (!) ingredientes inválidos (ex: número, string vazia, etc).
 
     if db is None:
         raise HTTPException(status_code=500, detail="Database connection error")
