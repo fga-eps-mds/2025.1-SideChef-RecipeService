@@ -380,7 +380,7 @@ def test_get_recipes_by_some_ingredients_no_connection(test_client_no_db):
     assert response.status_code == 500
     assert response.json() == {"detail": "Database connection error"}
 
-# Avaliar
+
 def test_get_recipes_by_some_ingredients_invalid_value(test_client):
   
     response = test_client.post("/recipe/someIngredients", json=[1, 2, 3])
