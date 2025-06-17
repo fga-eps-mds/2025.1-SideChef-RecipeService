@@ -2,7 +2,7 @@ from dotenv import dotenv_values
 from google import genai
 from google.genai import types
 from pathlib import Path
-from typing import File
+from typing import List
 from ..filters_routes import all_ingredients
 import pytesseract
 import cv2
@@ -17,7 +17,7 @@ def run_ocr(image):
     return output
 
     # Filter recipes through gemini response and return compatible recipes
-def filter_recipes(File[extracted_texts]):
+def filter_recipes(extracted_texts: List[str]):
     ingredients = []
 
     for item in extracted_texts:
