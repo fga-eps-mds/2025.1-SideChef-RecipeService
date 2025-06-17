@@ -1,5 +1,5 @@
 from fastapi import APIRouter, UploadFile, File
-from typing import File
+from typing import List
 import numpy as np
 import cv2
 import recipe.routes.utils.ocr_utils as ocr
@@ -14,11 +14,12 @@ router = APIRouter(
 
 # Endpoint to run OCR receiving target image as POST method
 @router.post("/run-ocr/")
-async def run_ocr(files: File[UploadFile] = File(...)):
-  for file in files:
+async def run_ocr(files: List[UploadFile] = File(...)):
+  all_results = [] # Store every result, including error dictionaries. Might be usefull to deal with errors in the future
+  identified_products = []  # Products that are successfully read by the OCR
 
+  for file in files:
     try:
-      all_results = []
         # Read file
       file_contents = await file.read()
 
@@ -52,12 +53,14 @@ async def run_ocr(files: File[UploadFile] = File(...)):
       process_image.store_process_images()  # (for development only)
 
       if product.strip() == "reading_failed":
-        all_results.append({"error": f"reading_failed: {str(extracted_text.strip())}"})  # Note: find a way to deal with errors on filter_recipe or mobile side
+        all_results.append({"error": f"reading_failed: {str(extracted_text.strip())}"})  # Note: find a way to deal with errors on ocr_utils/filter_recipes or mobile side
       else: 
         all_results.append(product.strip())
+        identified_products.append(product.strip())
     
     except Exception as err:
-      return {"error": f"File upload failed: {str(err)}"}
+      all_results.append({"error": f"File upload failed: {str(err)}"})
+      continue
   
-  recipes = ocr.filter_recipes(all_results)
+  recipes = ocr.filter_recipes(identified_products)
   return recipes
