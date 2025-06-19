@@ -36,7 +36,7 @@ jobs:
         run: sleep 5
 
       - name: Run tests using pytest
-        run: docker compose exec fastapi pytest tests/test.py
+        run: docker compose exec fastapi pytest tests/test_main.py
 
       - name: Closing containers
         if: always()
