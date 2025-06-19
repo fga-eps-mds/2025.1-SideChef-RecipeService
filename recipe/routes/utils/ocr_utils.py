@@ -3,7 +3,7 @@ from google import genai
 from google.genai import types
 from pathlib import Path
 from typing import List
-from ..filters_routes import all_ingredients
+from filter_utils import all_ingredients
 import pytesseract
 import cv2
 import shutil
