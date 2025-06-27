@@ -31,7 +31,8 @@ db.getCollection('recipes').insertMany(
                     "quantidade": "",
                     "ingrediente": "chocolate granulado"
                 }
-            ]
+            ],
+            "image_url": "https://sidechef-recipe-images.s3.sa-east-1.amazonaws.com/brigadeiro.png"
         },
         {
             "Nome": "Bolo de Caneca",
@@ -83,7 +84,8 @@ db.getCollection('recipes').insertMany(
                     "quantidade": "1/2 xícara",
                     "ingrediente": "leite"
                 }
-            ]
+            ],
+            "image_url": "https://sidechef-recipe-images.s3.sa-east-1.amazonaws.com/bolo-de-caneca.png"
         },
         {
             "Nome": "Mousse de Maracujá",
@@ -103,7 +105,8 @@ db.getCollection('recipes').insertMany(
                     "quantidade": "1 lata",
                     "ingrediente": "creme de leite sem soro"
                 }
-            ]
+            ],
+            "image_url": "https://sidechef-recipe-images.s3.sa-east-1.amazonaws.com/Mousse-de-Maracuj%C3%A1.png"
         },
         {
             "Nome": "Banana Caramelada",
@@ -123,7 +126,8 @@ db.getCollection('recipes').insertMany(
                     "quantidade": "a gosto",
                     "ingrediente": "canela em lasca"
                 }
-            ]
+            ],
+            "image_url": "https://sidechef-recipe-images.s3.sa-east-1.amazonaws.com/Banana-Caramelada.png"
         },
         {
             "Nome": "Pavê de Bolacha",
@@ -167,7 +171,8 @@ db.getCollection('recipes').insertMany(
                     "quantidade": "1 xícara",
                     "ingrediente": "açúcar"
                 }
-            ]
+            ],
+            "image_url": "https://sidechef-recipe-images.s3.sa-east-1.amazonaws.com/Pav%C3%AA-de-Bolacha.png"
         },
         {
             "Nome": "Torta de Limão",
@@ -211,7 +216,8 @@ db.getCollection('recipes').insertMany(
                     "quantidade": "",
                     "ingrediente": "raspas de 2 limões para decorar"
                 }
-            ]
+            ],
+            "image_url": "https://sidechef-recipe-images.s3.sa-east-1.amazonaws.com/Torta-de-Lim%C3%A3o.png"
         },
         {
             "Nome": "Churros Caseiros",
@@ -247,7 +253,8 @@ db.getCollection('recipes').insertMany(
                     "quantidade": "a gosto",
                     "ingrediente": "canela"
                 }
-            ]
+            ],
+            "image_url": "https://sidechef-recipe-images.s3.sa-east-1.amazonaws.com/Churros-Caseiros.png"
         },
         {
             "Nome": "Bolo Red Velvet",
@@ -339,7 +346,8 @@ db.getCollection('recipes').insertMany(
                     "quantidade": "50 g",
                     "ingrediente": "nozes não triturada"
                 }
-            ]
+            ],
+            "image_url": "https://sidechef-recipe-images.s3.sa-east-1.amazonaws.com/Bolo-Red-Velvet.png"
         },
         {
             "Nome": "Bolo Mil-folhas",
@@ -375,7 +383,8 @@ db.getCollection('recipes').insertMany(
                     "quantidade": "2 colheres (sopa)",
                     "ingrediente": "açúcar de confeiteiro"
                 }
-            ]
+            ],
+            "image_url": "https://sidechef-recipe-images.s3.sa-east-1.amazonaws.com/Bolo-Mil-folhas.png"
         },
         {
             "Nome": "Suflê de chocolate",
@@ -399,7 +408,8 @@ db.getCollection('recipes').insertMany(
                     "quantidade": "200 g",
                     "ingrediente": "manteiga"
                 }
-            ]
+            ],
+            "image_url": "https://sidechef-recipe-images.s3.sa-east-1.amazonaws.com/sufle_chocolate.png"
         },
         {
             "Nome": "Omelete de Queijo",
@@ -431,7 +441,8 @@ db.getCollection('recipes').insertMany(
                     "quantidade": "a gosto",
                     "ingrediente": "caldo de galinha"
                 }
-            ]
+            ],
+            "image_url": "https://sidechef-recipe-images.s3.sa-east-1.amazonaws.com/sufle_chocolate.png"
         },
         {
             "Nome": "Arroz de Forno",
@@ -487,7 +498,8 @@ db.getCollection('recipes').insertMany(
                     "quantidade": "a gosto",
                     "ingrediente": "pimenta-do-reino"
                 }
-            ]
+            ],
+            "image_url": "https://sidechef-recipe-images.s3.sa-east-1.amazonaws.com/arroz_forno.png"
         },
         {
             "Nome": "Sanduíche Natural de Frango",
@@ -531,7 +543,8 @@ db.getCollection('recipes').insertMany(
                     "quantidade": "",
                     "ingrediente": "pão de forma"
                 }
-            ]
+            ],
+            "image_url": "https://sidechef-recipe-images.s3.sa-east-1.amazonaws.com/sanduiche-natural-de-frango.png"
         },
         {
             "Nome": "Panqueca Simples",
@@ -555,7 +568,8 @@ db.getCollection('recipes').insertMany(
                     "quantidade": "1 pitada",
                     "ingrediente": "sal"
                 }
-            ]
+            ],
+            "image_url": "https://sidechef-recipe-images.s3.sa-east-1.amazonaws.com/panqueca-simples.png"
         },
         {
             "Nome": "Macarrão Alho e Óleo",
@@ -579,7 +593,8 @@ db.getCollection('recipes').insertMany(
                     "quantidade": "a gosto",
                     "ingrediente": "Sal"
                 }
-            ]
+            ],
+            "image_url": "https://sidechef-recipe-images.s3.sa-east-1.amazonaws.com/macarrao_alho_oleo.png"
         },
         {
             "Nome": "Escondidinho de Carne Seca",
@@ -623,7 +638,8 @@ db.getCollection('recipes').insertMany(
                     "quantidade": "",
                     "ingrediente": "Queijo Parmesão"
                 }
-            ]
+            ],
+            "image_url": "https://sidechef-recipe-images.s3.sa-east-1.amazonaws.com/escondidinho-carne-seca.png"
         },
         {
             "Nome": "Frango Xadrez",
@@ -683,7 +699,8 @@ db.getCollection('recipes').insertMany(
                     "quantidade": "2 colheres (sopa)",
                     "ingrediente": "amendoim torrado"
                 }
-            ]
+            ],
+            "image_url": "https://sidechef-recipe-images.s3.sa-east-1.amazonaws.com/frango-xadrez.png"
         },
         {
             "Nome": "Risoto de Camarão",
@@ -735,7 +752,8 @@ db.getCollection('recipes').insertMany(
                     "quantidade": "1/2",
                     "ingrediente": "limão"
                 }
-            ]
+            ],
+            "image_url": "https://sidechef-recipe-images.s3.sa-east-1.amazonaws.com/risoto-camarao.png"
         },
         {
             "Nome": "Ravioli Recheado",
@@ -783,7 +801,8 @@ db.getCollection('recipes').insertMany(
                     "quantidade": "a gosto",
                     "ingrediente": "sal"
                 }
-            ]
+            ],
+            "image_url": "https://sidechef-recipe-images.s3.sa-east-1.amazonaws.com/ravioli_recheado.png"
         },
         {
             "Nome": "Cordeiro Assado com Ervas",
@@ -831,7 +850,8 @@ db.getCollection('recipes').insertMany(
                     "quantidade": "1 maço",
                     "ingrediente": "salsinha picada"
                 }
-            ]
+            ],
+            "image_url": "https://sidechef-recipe-images.s3.sa-east-1.amazonaws.com/cordeiro-assado-em-ervas.png"
         }
     ]
 )
