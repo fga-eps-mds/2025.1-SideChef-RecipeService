@@ -19,3 +19,4 @@ class Recipe(BaseModel):
 class Test():
     Nome: str
     Tiopo: str
+    Comida : str
