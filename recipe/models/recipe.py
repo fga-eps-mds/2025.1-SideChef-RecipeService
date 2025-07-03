@@ -17,4 +17,4 @@ class Recipe(BaseModel):
     image_url: Optional[str] = Field(None, description=" URL da imagem") 
 
 class Test():
-    
+    Nome: str
