@@ -1,13 +1,14 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from typing import List, Optional
 
 class Ingredient(BaseModel):
-    quantidade: Optional[str] = ""
-    ingrediente: str
+    name: str
+    quantity: Optional[str] = ""
 
 class Recipe(BaseModel):
-    Nome: str
-    Tipo: str
-    Dificuldade: str
-    Ingredientes: List[Ingredient]
-    Preparo: str
+    name: str
+    type: str
+    difficulty: str
+    ingredients: List[Ingredient]
+    prepare: str
+    image_url: Optional[str] = None
