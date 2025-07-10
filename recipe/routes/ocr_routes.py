@@ -34,14 +34,14 @@ async def run_ocr(files: List[UploadFile] = File(...)):
       process_image = ocr.Enhance(image)  # Initialize class with target image
       processed_image = process_image.execute()  # Run execute function
 
-        # Extract OCR output
+      # Extract OCR output
       extracted_text = ocr.run_ocr(processed_image)
 
-        # Send OCR's results to gemini and get response
+      # Send OCR's results to gemini and get response
       initialize_gemini = ocr.Gemini(extracted_text)
       product = initialize_gemini.execute()
 
-        # Check if reading failed
+      # Check if reading failed
       if product.strip() == "reading_failed":
         processed_image = process_image.invert_image()  # Try alternative image processing  
         
