@@ -9,3 +9,5 @@ numpy
 opencv-python
 pytesseract
 pytest
+google-genai
+pathlib

@@ -10,9 +10,9 @@ router = APIRouter(
     tags=["Recipe"],
 )
 
+
 @router.post("/createRecipes")
-def create_recipe(recipe: Recipe):
-    
+def create_recipe(recipe: Recipe): 
     if db is None:
         raise HTTPException(status_code=500, detail="Database connection error")
     recipes_collection = db["recipes"]
