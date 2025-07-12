@@ -20,6 +20,10 @@ def run_ocr(image):
 def filter_recipes(extracted_texts: List[str]):
     ingredients = []
 
+    if len(extracted_texts) == 0:
+        recipes = []
+        return recipes
+
     for item in extracted_texts:
         item = item.lower()
 
@@ -152,6 +156,8 @@ class Enhance:
             cv2.imwrite(str(folder / "original_img.png"), self.img)
             cv2.imwrite(str(folder / "thresholding.png"), self.thresh)
             cv2.imwrite(str(folder / "equalized.png"), self.equalized)
+            cv2.imwrite(str(folder / "resized.png"), self.resized)
+
             if self.inverted_image is not None:
                 cv2.imwrite(str(folder / "inverted_img.png"), self.inverted_image)
             
