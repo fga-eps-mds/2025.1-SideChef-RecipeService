@@ -17,7 +17,7 @@ def create_recipe(recipe: Recipe):
     
     recipes_collection = db["recipes"]
 
-    duplicate_recipe = recipes_collection.find_one({"Nome": recipe.Nome})
+    duplicate_recipe = recipes_collection.find_one({"Name": recipe.Name})
 
     if duplicate_recipe:
         raise HTTPException(status_code=400, detail="Recipe with this name already exists")
@@ -35,7 +35,7 @@ def get_recipes(name: Optional[str] = Query(None, description="Optional name fil
     
     recipes_collection = db["recipes"]
 
-    query = {"name": name} if name else {}
+    query = {"Name": name} if name else {}
 
     recipes = list(recipes_collection.find(query))
 
@@ -53,19 +53,19 @@ def get_recipes(name: Optional[str] = Query(None, description="Optional name fil
 
 
 @router.get("/oneIngredient")
-def get_recipes_by_one(ingrediente: str):
+def get_recipes_by_one(ingredient: str):
 
     if db is None:
         raise HTTPException(status_code=500, detail="Database connection error")
     
-    if not isinstance(ingrediente, str) or not ingrediente.strip():
+    if not isinstance(ingredient, str) or not ingredient.strip():
         raise HTTPException(status_code=400, detail="Invalid ingredient format. Expected a non-empty string.")
 
     # como é uma str e não uma list usa regex   
     # aceitar plural
     print("procura de acordo com um item")                                               
     # case insensitive
-    query = db["recipes"].find({"Ingredientes": {"$regex": fr"\b{ingrediente}a*o*s*\b", "$options": "i"}})        
+    query = db["recipes"].find({"Ingredients": {"$regex": fr"\b{ingredient}a*o*s*\b", "$options": "i"}})        
     items = []
     for item in query:
         item["id"] = str(item["_id"])
@@ -97,7 +97,7 @@ def get_recipes_by_all(ingredients : list[str]):
             "message" : "There is no recipes with such ingredients"
         }
 
-    #criar um lista com as querys de cada ingrediente da lista
+    #criar um lista com as querys de cada ingredient da lista
     filters = []
     for item in ingredientsList:
         if item in ["", "   ", "\t"]:
@@ -105,10 +105,10 @@ def get_recipes_by_all(ingredients : list[str]):
                 "recipes" : [],
                 "message" : "There is no recipes with such ingredients"
             }
-        f = {"Ingredientes": {"$regex": fr"\b{item}a*o*s*\b", "$options": "i"}}
+        f = {"Ingredients": {"$regex": fr"\b{item}a*o*s*\b", "$options": "i"}}
         filters.append(f)
 
-    #buscar receitas com todos os ingredientes (operador "$and")
+    #buscar receitas com todos os Ingredients (operador "$and")
     query = db["recipes"].find({"$and": filters})
     items = []
     for item in query:
@@ -125,7 +125,7 @@ def get_recipes_by_all(ingredients : list[str]):
         "message" : message 
     }
 
-    #se não tiver receitas com todos os ingredientes, buscar uma que tenha alguns deles (operador "$or")
+    #se não tiver receitas com todos os Ingredients, buscar uma que tenha alguns deles (operador "$or")
 @router.post("/someIngredients")
 def get_recipes_by_some(ingredients : list[str]):
 
@@ -146,7 +146,7 @@ def get_recipes_by_some(ingredients : list[str]):
     recipes_collection = db["recipes"]
     filters = []
     for item in ingredientsList:
-        f = {"Ingredientes": {"$regex": fr"\b{item}a*o*s*\b", "$options": "i"}}
+        f = {"Ingredients": {"$regex": fr"\b{item}a*o*s*\b", "$options": "i"}}
         filters.append(f)
 
     or_query = recipes_collection.find({"$or": filters})
