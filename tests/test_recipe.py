@@ -19,20 +19,31 @@ class MockData:
         recipe = {
             "_id": id,
             "Name": name,
-            "Tipo": recipe_type,
+            "Type": recipe_type,
             "Difficulty": difficulty,
             "Ingredients": ingredients,
             "Preparation": preparation
         }
         return recipe
     
+    ingredient = {
+        "ingredient": "açúcar",
+        "quantity": "1 xícara"
+    }
+
+    ingredient2 = {
+        "ingredient": "farinha",
+        "quantity": "2 xícaras"
+    }
+
     # Receita a inserir(sem id)
     input_recipe = {
         "Name": "Bolo de Cenoura",
-        "Tipo": "Doce",
+        "Type": "Doce",
         "Difficulty": "Fácil",
-        "Ingredients": ["cenoura", "açúcar", "farinha"],
-        "Preparation": "Bata tudo no liquidificador e leve ao forno por 30 minutos"
+        "Ingredients": [ingredient, ingredient2],
+        "Preparation": "Bata tudo no liquidificador e leve ao forno por 30 minutos",
+        "image_url": "https://example.com/bolo_cenoura.jpg"
     }
     
     # Receita a ser repetida
@@ -41,7 +52,7 @@ class MockData:
         name= "Milk Shake de Banana",
         recipe_type="Bebida Gelada",
         difficulty="Fácil",
-        ingredients=["leite", "banana"],
+        ingredients=[ingredient, ingredient2],
         preparation="Bata tudo no liquidificador"
 
     )
@@ -173,7 +184,7 @@ def mock_mongo_db(mock_mongo_collection):
 # Aplica a conexão simulada do banco no código e instancia um client;
 @pytest.fixture
 def test_client(mock_mongo_db, monkeypatch):
-    monkeypatch.setattr('recipe.routes.recipe.db', mock_mongo_db)
+    monkeypatch.setattr('recipe.routes.recipe_routes.db', mock_mongo_db)
     client = TestClient(app)
 
     yield client
@@ -181,7 +192,7 @@ def test_client(mock_mongo_db, monkeypatch):
 # Caso e que não há conexão;
 @pytest.fixture
 def test_client_no_db(monkeypatch):
-    monkeypatch.setattr('recipe.routes.recipe.db', None)  
+    monkeypatch.setattr('recipe.routes.recipe_routes.db', None)  
     client = TestClient(app)
 
     yield client
