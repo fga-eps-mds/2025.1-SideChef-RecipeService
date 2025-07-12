@@ -12,8 +12,28 @@ services:
     networks:
       - mongo-compose-network
 
+  recipeservice-prod:
+    container_name: recipeservice-prod
+    image: recipeservice-prod
+    profiles: [prod]
+    build:
+      context: .
+      dockerfile: ./Dockerfile.prod
+    ports:
+      - 8001:8001
+    env_file:
+      - .env
+    volumes:
+      - ./:/recipeservice
+    depends_on:
+      - mongo
+    restart: on-failure
+    networks:
+      - mongo-compose-network
+
   mongo-express:
     image: mongo-express
+    profiles: [dev]
     restart: always
     ports:
       - 8080:8081
@@ -27,12 +47,13 @@ services:
     networks:
       - mongo-compose-network
 
-  fastapi:
-    container_name: recipeservice-api
+  recipeservice-dev:
+    container_name: recipeservice-dev
+    image: recipeservice-dev
+    profiles: [dev]
     build:
       context: .
-      dockerfile: ./Dockerfile
-    image: recipeservice-api
+      dockerfile: ./Dockerfile.dev
     env_file:
       - .env
     ports:
