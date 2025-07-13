@@ -23,6 +23,7 @@ jobs:
         run: |
           cat <<EOF > .env
           ME_CONFIG_MONGODB_URL=mongodb://root:admin@localhost:27017/
+          MONGO_DB_NAME=db_name
           ME_CONFIG_MONGODB_ADMINUSERNAME=root
           ME_CONFIG_MONGODB_ADMINPASSWORD=admin
           MONGO_INITDB_ROOT_USERNAME=root
