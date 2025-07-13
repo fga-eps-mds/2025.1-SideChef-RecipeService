@@ -21,4 +21,4 @@ RUN pip install --no-cache-dir -r /recipeservice/requirements.txt
 
 COPY . /recipeservice
 
-CMD ["fastapi", "run", "main.py", "--port", "8001"]
+CMD ["fastapi", "run", "main.py", "--port", "10000"]
