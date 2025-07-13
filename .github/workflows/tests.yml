@@ -30,7 +30,7 @@ jobs:
           EOF
 
       - name: Run docker compose
-        run: docker compose --profile up --build
+        run: docker compose --profile dev up -d --build
 
       - name: Wait building
         run: sleep 5
