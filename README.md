@@ -18,27 +18,32 @@ Primeiramente instale o [Docker](https://www.docker.com) no seu computador.
 Clone este repositório na sua máquina.
 
 ### 3. Crie o arquivo .env
-Dentro do reposítório, crie um arquivo chamado `.env` e adicione as informações enviadas pelos mantenedores, ou configure a própria pelo template:
+Dentro do reposítório, crie um arquivo chamado `.env` e adicione as informações enviadas pelos mantenedores, ou configure a própria pelo template incluído no arquivo `.env.example`:
 
 ```
-DOMAIN=$DOMAIN$
-ENVIRONMENT=$local$
-BACKEND_CORS_ORIGINS=$http://localhost:PORT$
-JWT_SECRET_KEY=$JWT$
+ME_CONFIG_MONGODB_URL=mongodb://mongo:27017/
+MONGO_DB_NAME=nome_do_db
+MONGO_INITDB_ROOT_USERNAME=user_root
+MONGO_INITDB_ROOT_PASSWORD=password_root
+
+ME_CONFIG_MONGODB_ADMINUSERNAME=user_admin_mongo
+ME_CONFIG_MONGODB_ADMINPASSWORD=password_admin_mongo
+
+GEMINI_API_KEY=gemini_api_key
 ```
-### 4. Execute o docker-compose up
+### 4. Execute o docker-compose up como desenvolvedor
 
 Na pasta do repositório execute o comando:
 
 ```
-docker-compose up
+docker compose --profile dev up
 ```
 
 ### 5. Acesse a API
-Para acessar a API, utilize o `localhost` na porta `8080`:
+Para acessar a API, utilize o `localhost` na porta `8001`:
 
-http://localhost:8080/docs
+http://localhost:8001/docs
 
-Já para acessar o bando de dados MongoDB, acesse pela porta `8081`:
+Já para acessar o bando de dados MongoDB, acesse pela porta `8080`:
 
-http://localhost:8081
+http://localhost:8080

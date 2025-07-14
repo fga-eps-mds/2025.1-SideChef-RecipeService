@@ -1,7 +1,25 @@
 services:
+  recipeservice-prod:
+    container_name: recipeservice-prod
+    image: recipeservice-prod
+    profiles: [prod]
+    build:
+      context: .
+      dockerfile: ./Dockerfile.prod
+    ports:
+      - 8001:8001
+    env_file:
+      - .env_prod
+    volumes:
+      - ./:/recipeservice
+    restart: on-failure
+
   mongo:
     image: mongo
+    profiles: [dev]
     restart: always
+    env_file: 
+    - .env
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
@@ -12,11 +30,14 @@ services:
     networks:
       - mongo-compose-network
 
+
   mongo-express:
     image: mongo-express
-    restart: always
+    profiles: [dev]
     ports:
-      - 8081:8081
+      - 8080:8081
+    env_file: 
+    - .env
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: ${ME_CONFIG_MONGODB_ADMINUSERNAME}
       ME_CONFIG_MONGODB_ADMINPASSWORD: ${ME_CONFIG_MONGODB_ADMINPASSWORD}
@@ -27,16 +48,17 @@ services:
     networks:
       - mongo-compose-network
 
-  fastapi:
-    container_name: recipeservice-api
+  recipeservice-dev:
+    container_name: recipeservice-dev
+    image: recipeservice-dev
+    profiles: [dev]
     build:
       context: .
-      dockerfile: ./Dockerfile
-    image: recipeservice-api
-    env_file:
-      - .env
+      dockerfile: ./Dockerfile.dev
+    env_file: 
+    - .env
     ports:
-      - "8080:8080"
+      - "8001:8080"
     environment:
       - DEBUG=true
     volumes:
