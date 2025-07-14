@@ -1,5 +1,9 @@
 from pymongo import MongoClient
-from core.config_loader import settings
+import os
+from dotenv import load_dotenv
 
-client = MongoClient(settings.MONGO_URL)
-db = client[settings.DB_NAME]
+load_dotenv()
+
+
+client = MongoClient(os.getenv("ME_CONFIG_MONGODB_URL"))
+db = client[os.getenv("MONGO_DB_NAME")]
