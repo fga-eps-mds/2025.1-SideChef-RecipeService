@@ -5,10 +5,10 @@ from core.database import db
 from bson import ObjectId
 from fastapi.responses import JSONResponse
 
-def one_ingredient(ingrediente : str):
+def one_ingredient(ingredient : str):
                                 #since it is a str and not a list, use regex     #accept plural
     print("search according to one item")                                               #case insensitive
-    query = db["recipes"].find({"Ingredientes.ingrediente": {"$regex": fr"\b{ingrediente}a*o*s*\b", "$options": "i"}})        
+    query = db["recipes"].find({"Ingredients.ingredient": {"$regex": fr"\b{ingredient}a*o*s*\b", "$options": "i"}})        
     items = []
     for item in query:
         item["id"] = str(item["_id"])
@@ -24,7 +24,7 @@ def all_ingredients(ingredients : list[str]):
     #create a list with the queries for each ingredient in the list
     filters = []
     for item in ingredients_list:
-        f = {"Ingredientes.ingrediente": {"$regex": fr"^{item}(s)?$", "$options": "i"}}
+        f = {"Ingredients.ingredient": {"$regex": fr"^{item}(s)?$", "$options": "i"}}
         filters.append(f)
 
     #search for recipes with all ingredients (operator "$and")
@@ -50,7 +50,7 @@ def some_ingredients(ingredients : list[str]):
 
     filters = []
     for item in ingredients_list:
-        f = {"Ingredientes.ingrediente": {"$regex": fr"\b{item}a*o*s*\b", "$options": "i"}}
+        f = {"Ingredients.ingredient": {"$regex": fr"\b{item}a*o*s*\b", "$options": "i"}}
         filters.append(f)
 
 

@@ -18,21 +18,32 @@ class MockData:
     def make_recipe(id: str, name: str, recipe_type: str, difficulty: str, ingredients: list, preparation: str) -> Dict:
         recipe = {
             "_id": id,
-            "Nome": name,
-            "Tipo": recipe_type,
-            "Dificuldade": difficulty,
-            "Ingredientes": ingredients,
-            "Preparo": preparation
+            "Name": name,
+            "Type": recipe_type,
+            "Difficulty": difficulty,
+            "Ingredients": ingredients,
+            "Preparation": preparation
         }
         return recipe
     
+    ingredient = {
+        "ingredient": "açúcar",
+        "quantity": "1 xícara"
+    }
+
+    ingredient2 = {
+        "ingredient": "farinha",
+        "quantity": "2 xícaras"
+    }
+
     # Receita a inserir(sem id)
     input_recipe = {
-        "Nome": "Bolo de Cenoura",
-        "Tipo": "Doce",
-        "Dificuldade": "Fácil",
-        "Ingredientes": ["cenoura", "açúcar", "farinha"],
-        "Preparo": "Bata tudo no liquidificador e leve ao forno por 30 minutos"
+        "Name": "Bolo de Cenoura",
+        "Type": "Doce",
+        "Difficulty": "Fácil",
+        "Ingredients": [ingredient, ingredient2],
+        "Preparation": "Bata tudo no liquidificador e leve ao forno por 30 minutos",
+        "image_url": "https://example.com/bolo_cenoura.jpg"
     }
     
     # Receita a ser repetida
@@ -41,7 +52,7 @@ class MockData:
         name= "Milk Shake de Banana",
         recipe_type="Bebida Gelada",
         difficulty="Fácil",
-        ingredients=["leite", "banana"],
+        ingredients=[ingredient, ingredient2],
         preparation="Bata tudo no liquidificador"
 
     )
@@ -83,13 +94,13 @@ def mock_mongo_collection():
     # Simulação de retorno de uma receita
     def mock_find_one(query: Dict = None, **kwargs) -> Dict:
         for doc in collection._mock_data:
-            if query.get("Nome") == doc.get("Nome"):
+            if query.get("Name") == doc.get("Name"):
                 return doc.copy()
         return None
     
     # Recebe o dicionário onde se define o regex e retorna um padrão a ser testado
     def compile_pattern(pattern_input):
-        ingredients_filter = pattern_input.get("Ingredientes", {})
+        ingredients_filter = pattern_input.get("Ingredients", {})
         if not ingredients_filter:
             raise ValueError("Filter")
         regex = ingredients_filter.get("$regex")
@@ -104,7 +115,7 @@ def mock_mongo_collection():
 
     # Retorna lista de documentos:
     ## query_all para allIngredients;
-    ## query_name para nome opcional em getRecipes;
+    ## query_name para Name opcional em getRecipes;
     ## Outro caso para oneIngredient;
     def mock_find(query: Dict = None, **kwargs):
         if not query:
@@ -112,32 +123,32 @@ def mock_mongo_collection():
         recipes = []
         query_all = query.get("$and")
         query_some = query.get("$or")
-        query_name = query.get("Nome")
+        query_name = query.get("Name")
 
         if query_all != None and isinstance(query_all, list):
             for data in collection._mock_data:
-                ingredientes = data.get("Ingredientes", [])
-                if ingredientes is None:
-                    ingredientes = []
-                if all(any(compile_pattern(f).match(ing) for ing in ingredientes) for f in query_all):
+                Ingredients = data.get("Ingredients", [])
+                if Ingredients is None:
+                    Ingredients = []
+                if all(any(compile_pattern(f).match(ing) for ing in Ingredients) for f in query_all):
                     recipes.append(data)
             return recipes
         if query_some != None and isinstance(query_some, list):
             for data in collection._mock_data:
-                ingredientes = data.get("Ingredientes", [])
-                if ingredientes is None:
-                    ingredientes = []
-                if any(any(compile_pattern(f).match(ing) for ing in ingredientes) for f in query_some):
+                Ingredients = data.get("Ingredients", [])
+                if Ingredients is None:
+                    Ingredients = []
+                if any(any(compile_pattern(f).match(ing) for ing in Ingredients) for f in query_some):
                     recipes.append(data)
             return recipes
 
         if query_name != None:
             for doc in collection._mock_data:
-                if doc.get("Nome") == query_name:
+                if doc.get("Name") == query_name:
                     recipes.append(doc)
             return recipes
 
-        ingredients_filter = query.get("Ingredientes", {})
+        ingredients_filter = query.get("Ingredients", {})
         regex = ingredients_filter.get("$regex")
         options = ingredients_filter.get("$options", "")
         if regex:
@@ -145,7 +156,7 @@ def mock_mongo_collection():
             pattern = re.compile(regex, flags)
             result = []
             for doc in collection._mock_data:
-                ings = doc.get("Ingredientes", [])
+                ings = doc.get("Ingredients", [])
                 if ings is None:
                     ings = []
                 if any(pattern.search(ing) for ing in ings):
@@ -173,7 +184,7 @@ def mock_mongo_db(mock_mongo_collection):
 # Aplica a conexão simulada do banco no código e instancia um client;
 @pytest.fixture
 def test_client(mock_mongo_db, monkeypatch):
-    monkeypatch.setattr('recipe.routes.recipe.db', mock_mongo_db)
+    monkeypatch.setattr('recipe.routes.recipe_routes.db', mock_mongo_db)
     client = TestClient(app)
 
     yield client
@@ -181,7 +192,7 @@ def test_client(mock_mongo_db, monkeypatch):
 # Caso e que não há conexão;
 @pytest.fixture
 def test_client_no_db(monkeypatch):
-    monkeypatch.setattr('recipe.routes.recipe.db', None)  
+    monkeypatch.setattr('recipe.routes.recipe_routes.db', None)  
     client = TestClient(app)
 
     yield client
@@ -195,7 +206,7 @@ def test_create_recipe_success(test_client, mock_mongo_collection):
         "message": "Recipe created successfully", 
         "recipe": input_recipe}
 
-    mock_mongo_collection.find_one.assert_called_once_with({"Nome": input_recipe["Nome"]})
+    mock_mongo_collection.find_one.assert_called_once_with({"Name": input_recipe["Name"]})
     mock_mongo_collection.insert_one.assert_called_once_with(input_recipe)
 
 def test_create_recipe_error_no_connection(test_client_no_db):
@@ -210,32 +221,32 @@ def test_create_recipe_error_already_created(test_client, mock_mongo_collection)
 
     assert response.status_code == 400
     assert response.json() == {"detail": "Recipe with this name already exists"}
-    mock_mongo_collection.find_one.assert_called_once_with({"Nome": MockData.existing_recipe["Nome"]})
+    mock_mongo_collection.find_one.assert_called_once_with({"Name": MockData.existing_recipe["Name"]})
     mock_mongo_collection.insert_one.assert_not_called()
  
 
 def test_filter_one_ingredient_success(test_client, mock_mongo_collection):
-    response = test_client.get("/recipe/oneIngredient", params={"ingrediente": "leite"})
+    response = test_client.get("/recipe/oneIngredient", params={"ingredient": "leite"})
 
     assert response.status_code == 200
     response = response.json()
     recipes = response.get("recipes", [])
 
     assert len(recipes) == 2
-    assert all("leite" in recipe["Ingredientes"] for recipe in recipes)
+    assert all("leite" in recipe["Ingredients"] for recipe in recipes)
 
     mock_mongo_collection.find.assert_called_once_with({
-        "Ingredientes": {"$regex": fr"\bleitea*o*s*\b", "$options": "i"}
+        "Ingredients": {"$regex": fr"\bleitea*o*s*\b", "$options": "i"}
     })
 
 def test_filter_one_ingredient_no_connection(test_client_no_db):
-    response = test_client_no_db.get("/recipe/oneIngredient", params={"ingrediente": "leite"})
+    response = test_client_no_db.get("/recipe/oneIngredient", params={"ingredient": "leite"})
 
     assert response.status_code == 500
     assert response.json() == {"detail": "Database connection error"}
 
 def test_filter_one_ingredient_empty_value(test_client):
-    response = test_client.get("/recipe/oneIngredient", params={"ingrediente": ""})
+    response = test_client.get("/recipe/oneIngredient", params={"ingredient": ""})
 
     assert response.status_code == 400
     assert response.json() == {
@@ -248,12 +259,12 @@ def test_get_recipes_by_all_ingredients_success(test_client, mock_mongo_collecti
     recipes = response.json().get("recipes")
     assert response.json().get("message") == "Found recipes with all ingredients"
     assert len(recipes) == 1
-    assert recipes[0]["Nome"] == "Milk Shake de Banana"
+    assert recipes[0]["Name"] == "Milk Shake de Banana"
 
     expected_and_query = {
         "$and": [
-            {"Ingredientes": {"$regex": fr"\bleitea*o*s*\b", "$options": "i"}},
-            {"Ingredientes": {"$regex": fr"\bbananaa*o*s*\b", "$options": "i"}}
+            {"Ingredients": {"$regex": fr"\bleitea*o*s*\b", "$options": "i"}},
+            {"Ingredients": {"$regex": fr"\bbananaa*o*s*\b", "$options": "i"}}
         ]
     }
 
@@ -300,12 +311,12 @@ def test_get_recipes_with_name_filter_found(test_client, mock_mongo_collection):
 
     expected_data = []
     for doc in mock_mongo_collection._mock_data:
-        if doc["Nome"] == name_to_filter:
+        if doc["Name"] == name_to_filter:
             expected_data.append(doc)
     assert response.json()["recipes"] == expected_data
     assert response.json()["message"] == "Found recipes with query"
     assert len(response.json()["recipes"]) == 1
-    mock_mongo_collection.find.assert_called_once_with({"Nome": name_to_filter})
+    mock_mongo_collection.find.assert_called_once_with({"Name": name_to_filter})
 
 
 def test_get_recipes_with_name_filter_not_found(test_client, mock_mongo_collection):
@@ -316,7 +327,7 @@ def test_get_recipes_with_name_filter_not_found(test_client, mock_mongo_collecti
     assert response.json()["recipes"] == []
     assert response.json()["message"] == "There is no recipes with query"
 
-    mock_mongo_collection.find.assert_called_once_with({"Nome": name_to_filter})
+    mock_mongo_collection.find.assert_called_once_with({"Name": name_to_filter})
 
 def test_get_recipes_empty_collection(test_client, mock_mongo_collection):
     original_data = mock_mongo_collection._mock_data.copy()
@@ -347,8 +358,8 @@ def test_get_recipes_by_some_ingredients_success(test_client, mock_mongo_collect
 
     expected_or_query = {
         "$or": [
-            {"Ingredientes": {"$regex": fr"\bleitea*o*s*\b", "$options": "i"}},
-            {"Ingredientes": {"$regex": fr"\bchocolatea*o*s*\b", "$options": "i"}}
+            {"Ingredients": {"$regex": fr"\bleitea*o*s*\b", "$options": "i"}},
+            {"Ingredients": {"$regex": fr"\bchocolatea*o*s*\b", "$options": "i"}}
         ]
     }
     mock_mongo_collection.find.assert_called_once_with(expected_or_query)
@@ -366,8 +377,8 @@ def test_get_recipes_by_some_ingredients_not_found(test_client, mock_mongo_colle
 
     expected_or_query = {
         "$or": [
-            {"Ingredientes": {"$regex": fr"\bjilóa*o*s*\b", "$options": "i"}},
-            {"Ingredientes": {"$regex": fr"\babacatea*o*s*\b", "$options": "i"}}
+            {"Ingredients": {"$regex": fr"\bjilóa*o*s*\b", "$options": "i"}},
+            {"Ingredients": {"$regex": fr"\babacatea*o*s*\b", "$options": "i"}}
         ]
     }
     mock_mongo_collection.find.assert_called_once_with(expected_or_query)

@@ -2,17 +2,16 @@ from pydantic import BaseModel, Field
 from typing import List, Optional
 
 class Ingredient(BaseModel):
-    quantidade: Optional[str] = ""
-    ingrediente: str
+    quantity: Optional[str] = ""
+    ingredient: str
 
 
 
-#Need to change the var's name to english here and in "SideChef-Mobile"!
 class Recipe(BaseModel):
-    Nome: str
-    Tipo: str
-    Dificuldade: str
-    Ingredientes: List[Ingredient]
-    Preparo: str
+    Name: str
+    Type: str
+    Difficulty: str
+    Ingredients: List[Ingredient]
+    Preparation: str
     image_url: Optional[str] = Field(None, description=" URL da imagem") 
 
